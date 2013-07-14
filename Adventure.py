@@ -25,7 +25,7 @@ while Decis != TERMINATE:
         if StuffLocation[i] == Location:
             print StuffDesc[i]                 
            
-      Decis = input ('What now?')
+      Decis = raw_input ('What now?')
       Decis = Decis.upper()
  
     #process their input
