@@ -60,16 +60,14 @@ while Decis != TERMINATE:
         for i in range( FIRST_STUFF, MAX_STUFF ):
             StuffName = StuffDesc[i].upper()
 
-            if StuffLocation[i] == Location and StuffName == Thing:
+            if StuffLocation[i] == Location and (StuffName == Thing or Thing == 'ALL'):
                 StuffLocation[i] = INVENTORY
                 GotIt = True
-                GotWhat = StuffDesc[i]
+                print 'Got ' + StuffDesc[i] + '!'
             elif StuffLocation[i] == INVENTORY and StuffName == Thing:
                 print 'Got ' +  StuffDesc[i] + ' already!'
                 
-        if GotIt:
-                print 'Got ' + GotWhat + '!' 
-        else:
+        if not GotIt:
             print "what? I can't pick " + Thing + " up!"
 
       elif Decis == 'DROP':
@@ -83,16 +81,14 @@ while Decis != TERMINATE:
         for i in range( FIRST_STUFF, MAX_STUFF ):
             StuffName = StuffDesc[i].upper()
 
-            if StuffLocation[i] == INVENTORY and StuffName == Thing:
+            if StuffLocation[i] == INVENTORY and (StuffName == Thing or Thing == 'ALL'):
                 StuffLocation[i] = Location
                 DroppedIt = True
-                DroppedWhat = StuffDesc[i]
+                print 'Dropped ' + StuffDesc[i] + '!' 
             elif StuffLocation[i] == Location and StuffName == Thing:
                 print "Don't have " +  StuffDesc[i] + ' but I can see it!'
                 
-        if DroppedIt:
-                print 'Dropped ' + DroppedWhat + '!' 
-        else:
+        if not DroppedIt:
             print "what? I don't have " + Thing + "!"
             
             
