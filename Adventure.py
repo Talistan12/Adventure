@@ -1,11 +1,26 @@
 Location = "Stream"
 Decis    = "Go"
 INVENTORY = "Inventory"
-StuffDesc = ["Candle","Knife","Apple","Water","Rations"]
+StuffDesc = ["Lamp","Serrated knife","Apple","Water","Rations"]
 StuffLocation = ["InHut",INVENTORY,"Stream","Stream","Stream"]
 FIRST_STUFF = 0
 MAX_STUFF = 5
 TERMINATE = "STOP"
+#storyline
+current_location = ['Stream',['NORTH','Hut'] ]
+print 'You have just woken up. Your'
+print "memory is hazy and you can't "
+print 'even remember your name and'
+print 'decide to give yourself one'
+name = raw_input('pick a name. ')
+print ''
+print 'You think you are in the'
+print 'lands of Hawcry, a land'
+print 'once ruled by giant eagles'
+print 'of immense strength and' 
+print 'great power.'
+print ''
+raw_input('Press enter to continue.')
 
 while Decis != TERMINATE:
       print
@@ -15,7 +30,7 @@ while Decis != TERMINATE:
       elif Location == "Hut" :
           print 'You are standing outside a little hut.  The front door is ajar.  A path leads South and West.'
       elif Location == "InHut" :
-          print 'You are standing inside a dark smelly little hut.  A door leads out.'
+          print 'You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.'
       elif Location == "Village":
           print 'You have arrived at a village. A path leads East.'
                         
@@ -97,6 +112,7 @@ while Decis != TERMINATE:
       elif Decis == 'I' or Decis == 'INVENT':
             #list any stuff which has a location of "Inventory"
             print 'You are currently holding'
+            print ""
             for i in range( FIRST_STUFF, MAX_STUFF ):                  
                 if StuffLocation[i] == INVENTORY:
                     print StuffDesc[i]
