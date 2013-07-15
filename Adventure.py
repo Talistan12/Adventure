@@ -7,7 +7,11 @@ FIRST_STUFF = 0
 MAX_STUFF = 6
 TERMINATE = "STOP"
 
-current_location = ['Stream',['NORTH','Hut'], ]
+InHut = ['In Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.',{'OUT':"hUT"},StuffDesc[0]]
+Village = ['Village','You have arrived at a village. A path leads East.',{'EAST':'Hut'}]
+Hut = ['Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.',{'SOUTH':'Stream','WEST':'Village','DOOR':'In Hut'}]
+Stream = ['Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.',{'NORTH':'Hut'}, [StuffDesc[2],StuffDesc[3],StuffDesc[4]]]
+current_location = [Stream]
 
 #storyline
 print 'You have just woken up. Your'
@@ -30,7 +34,7 @@ while Decis != TERMINATE:
       print
       #Tell the adventurer where they are.
       if Location == "Stream" :
-          print 'You are standing by a stream. The stream runs NE to SW. A path leads North.'
+          print Stream[1]
       elif Location == "Hut" :
           print 'You are standing outside a little hut.  The front door is ajar.  A path leads South and West.'
       elif Location == "InHut" :
@@ -107,7 +111,7 @@ while Decis != TERMINATE:
             print 'Drop what?'
             
       elif Decis.split()[0] == 'DROP':       
-        #Check whether the Stuff is in your Inentory  
+        #Check whether the Stuff is in your Inventory  
         DroppedIt = False
         DroppedWhat = ""
         Thing = Decis.split()[1]
@@ -119,8 +123,8 @@ while Decis != TERMINATE:
                 DroppedIt = True
                 print 'Dropped ' + StuffDesc[i] + '!' 
             elif StuffLocation[i] == Location and StuffName == Thing:
-                print "Don't have " +  StuffDesc[i] + ' but I can see it!'
-                #DroppedIt = True
+                print "I don't have " +  StuffDesc[i].lower() + ' but I can see it!'
+                DroppedIt = True
                 
         if not DroppedIt:
             print "what? I don't have " + Thing + "!"
