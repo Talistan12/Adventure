@@ -1,11 +1,13 @@
 Location = "Stream"
 Decis    = "Go"
 INVENTORY = "Inventory"
-StuffDesc = ["Candle","Knife","Apple","Water","Rations"]
-StuffLocation = ["InHut",INVENTORY,"Stream","Stream","Stream"]
+StuffDesc = ["Candle","Knife","Apple","Water","Rations","Ale"]
+StuffLocation = ["InHut","InHut","Tavern",INVENTORY,INVENTORY,"Tavern"]
 FIRST_STUFF = 0
-MAX_STUFF = 5
+MAX_STUFF = 6
 TERMINATE = "STOP"
+
+print 'You are a wanderer whose aim in life is too collect things. Your goal. Collect all objects in the region. There are 6 in total. FIND THOSE OBJECTS!'
 
 while Decis != TERMINATE:
       print
@@ -17,13 +19,15 @@ while Decis != TERMINATE:
       elif Location == "InHut" :
           print 'You are standing inside a dark smelly little hut.  A door leads out.'
       elif Location == "Village":
-          print 'You have arrived at a village. A path leads East.'
+          print 'You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maye you could get some ale and food. A path leads East.'
+      elif Location == "Tavern":
+            print 'you have arrived at a tavern bustling with people. It is called the Jolly Pig. A door leads out.'
                         
       #list any stuff which has a location matching where we are now.                 
       print 'There is also ..'
       for i in range( FIRST_STUFF, MAX_STUFF ):                  
         if StuffLocation[i] == Location:
-            print StuffDesc[i]                 
+            print " " + StuffDesc[i]                 
            
       Decis = raw_input ('What now?')
       Decis = Decis.upper()
@@ -47,8 +51,14 @@ while Decis != TERMINATE:
             print 'Out I go'
       elif Location == "Village" and Decis == 'E':
             Location = 'Hut'
-            print 'Off I go'  
-      elif Decis == 'N' or Decis == 'S' or Decis == 'E' or Decis == 'W':
+            print 'Off I go'
+      elif Location == "Village" and Decis == 'IN TAVERN':
+            Location = "Tavern"
+            print "In I go"
+      elif Location == "Tavern" and (Decis == 'OUT' or Decis == 'DOOR'):
+            Location = "Village"
+            print 'Out I go'
+      elif Decis == 'N' or Decis == 'S' or Decis == 'E' or Decis == 'W' or Decis == 'NW' or Decis == 'NE' or Decis == 'SW' or Decis == 'SE':
             print 'You cannot go that way'
       elif Decis == 'GET':
             print 'Get what?'
@@ -99,7 +109,7 @@ while Decis != TERMINATE:
             print 'You are currently holding'
             for i in range( FIRST_STUFF, MAX_STUFF ):                  
                 if StuffLocation[i] == INVENTORY:
-                    print StuffDesc[i]
+                    print " " + StuffDesc[i]
                 
       elif Decis == TERMINATE:
                 print 'You did not like our game? What a shame.. what a shame..'
