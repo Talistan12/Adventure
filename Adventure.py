@@ -34,13 +34,13 @@ while Decis != TERMINATE:
  
     #process their input
     
-      if Location == "Stream" and Decis == 'N':
+      if Location == "Stream" and Decis == 'N' or Decis == 'NORTH':
             Location = "Hut"
             print 'Off I go'
-      elif Location == "Hut" and Decis == 'S':
+      elif Location == "Hut" and Decis == 'S' or Decis == 'SOUTH':
             Location = "Stream"  
             print 'Off I go'
-      elif Location == "Hut" and Decis == 'W':
+      elif Location == "Hut" and Decis == 'W' or Decis == 'WEST':
             Location = 'Village'
             print 'Off I go'
       elif Location == "Hut" and (Decis == 'IN' or Decis == 'DOOR'):
@@ -51,14 +51,14 @@ while Decis != TERMINATE:
             print 'Out I go'
       elif Location == "Village" and Decis == 'E':
             Location = 'Hut'
-            print 'Off I go'
+            print 'Off I go'  
       elif Location == "Village" and Decis == 'IN TAVERN':
             Location = "Tavern"
             print "In I go"
       elif Location == "Tavern" and (Decis == 'OUT' or Decis == 'DOOR'):
             Location = "Village"
             print 'Out I go'
-      elif Decis == 'N' or Decis == 'S' or Decis == 'E' or Decis == 'W' or Decis == 'NW' or Decis == 'NE' or Decis == 'SW' or Decis == 'SE':
+      elif Decis == 'NORTH' or Decis == 'SOUTH' or Decis == 'EAST' or Decis == 'WEST' or Decis == 'N' or Decis == 'S' or Decis == 'E' or Decis == 'W'or Decis == 'NW' or Decis == 'NE' or Decis == 'SW' or Decis == 'SE':
             print 'You cannot go that way'
       elif Decis == 'GET':
             print 'Get what?'
@@ -104,7 +104,7 @@ while Decis != TERMINATE:
             
       elif Decis == 'LOOK':
             print "I'll repeat myself then, shall I?"
-      elif Decis == 'INVENT':
+      elif Decis == 'I' or Decis == 'INVENT':
             #list any stuff which has a location of "Inventory"
             print 'You are currently holding'
             for i in range( FIRST_STUFF, MAX_STUFF ):                  
