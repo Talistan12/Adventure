@@ -6,8 +6,10 @@ StuffLocation = ["InHut",INVENTORY,"Stream","Stream","Stream"]
 FIRST_STUFF = 0
 MAX_STUFF = 5
 TERMINATE = "STOP"
+
+current_location = ['Stream',['NORTH','Hut'], ]
+
 #storyline
-current_location = ['Stream',['NORTH','Hut'] ]
 print 'You have just woken up. Your'
 print "memory is hazy and you can't "
 print 'even remember your name and'
@@ -34,11 +36,16 @@ while Decis != TERMINATE:
       elif Location == "Village":
           print 'You have arrived at a village. A path leads East.'
                         
-      #list any stuff which has a location matching where we are now.                 
-      print 'There is also ..'
+      #list any stuff which has a location matching where we are now.     
+      is_stuff_there = False
+      for i in range( FIRST_STUFF, MAX_STUFF ):        
+          if StuffLocation[i] == Location:
+              is_stuff_there = True
+      if is_stuff_there == True:                        
+          print 'There is also ..'
       for i in range( FIRST_STUFF, MAX_STUFF ):                  
-        if StuffLocation[i] == Location:
-            print StuffDesc[i]                 
+          if StuffLocation[i] == Location:
+              print StuffDesc[i]                 
            
       Decis = raw_input ('What now?')
       Decis = Decis.upper()
@@ -81,9 +88,10 @@ while Decis != TERMINATE:
                 print 'Got ' + StuffDesc[i] + '!'
             elif StuffLocation[i] == INVENTORY and StuffName == Thing:
                 print 'Got ' +  StuffDesc[i] + ' already!'
+                GotIt = True
                 
         if not GotIt:
-            print "what? I can't pick " + Thing + " up!"
+            print "what? I can't pick " + Thing.lower() + " up!"
 
       elif Decis == 'DROP':
             print 'Drop what?'
@@ -102,6 +110,7 @@ while Decis != TERMINATE:
                 print 'Dropped ' + StuffDesc[i] + '!' 
             elif StuffLocation[i] == Location and StuffName == Thing:
                 print "Don't have " +  StuffDesc[i] + ' but I can see it!'
+                #DroppedIt = True
                 
         if not DroppedIt:
             print "what? I don't have " + Thing + "!"
