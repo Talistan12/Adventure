@@ -72,11 +72,57 @@ class Location:
      print "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount
      self.thingCount +=1
 
+class Landscape:
+   'place to put the locations'
+   locCount = 0
 
+   def __init__(self, code, shortName, longName):
+      self.code = code
+      self.shortName = shortName
+      self.longName = longName
+      self.looks = 0
+      self.LocCount = 0
+      self.locations = []
+      #print "New Location %d " % Location.locCount + self.code
+      #Location.locCount += 1
+      print "initilize the landscape"
+   
+   #def displayCount(self):
+   #  print "Total Locations %d" % Location.locCount
+
+   def listLocations(self):
+      if self.locCount > 0 :
+         print 'Display all locations..'
+         for i in range( 0, self.locCount ):
+               #print i
+               #print self.objects[i].code
+               self.locations[i].displayLocation()
+
+   def displayLandscape(self):
+      self.looks +=1
+      if self.looks < 2:
+        print self.longName
+      else:
+        print self.shortName
+      self.listLocations()  
+
+   def addLocation(self, location):
+     self.locations.append(location)
+     print "Added " + location.code + " to " + self.code + " as it's location %d " % self.locCount
+     self.locCount +=1
      
+   def addThingAtLocation(self,thing,locCode):
+      if self.locCount > 0 :
+         print 'Finding location..'
+         for i in range( 0, self.locCount ):
+               if self.locations[i].code == locCode:
+                     self.locations[i].addObject(thing)
         
 
-print 'START DEMO'        
+   
+        
+
+print 'START DEMO1 - In this demo Locations are put together in a list of Locations'        
 Locations = [
    Location('INHUT','In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.')
    ,Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food. A path leads East.')
@@ -102,8 +148,30 @@ Locations[1].displayCount()
 print Location.locCount
 
 
-print 'END DEMO' 
+print 'END DEMO1' 
 print
+
+
+print 'START DEMO2 - In this demo we keep the OO theme going and put all the locations into a parent object, doing away with the list of locations.'
+
+Adventure = Landscape("ADVENTURE","A Adventure","An amazing adventure")
+Adventure.addLocation(Location('INHUT','In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.'))
+Adventure.addLocation(Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food. A path leads East.'))
+Adventure.addLocation(Location('HUT','Near the Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.'))
+Adventure.addLocation(Location('STREAM','By a Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.'))
+Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.  A door leads out.'))
+Adventure.addLocation(Location('INVENT','Inventory','This is just a location to hold your gear.'))
+
+
+Adventure.addThingAtLocation(Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.'),'INHUT')
+Adventure.addThingAtLocation(Thing('LAMP','A Lamp','An old oil Lamp','It is glowing softly.'),'INHUT') 
+
+Adventure.listLocations()
+
+
+print 'END DEMO2' 
+print
+
 
 InHut = ['In Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.',{'OUT':"hUT"},StuffDesc[0]]
 Village = ['Village','You have arrived at a village. A path leads East.',{'EAST':'Hut'}]
