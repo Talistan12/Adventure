@@ -7,11 +7,112 @@ FIRST_STUFF = 0
 MAX_STUFF = 6
 TERMINATE = "STOP"
 
+
+class Thing:
+   'Common base class for all things'
+   thingCount = 0
+
+   def __init__(self, code, shortName, longName, description):
+      self.code = code
+      self.shortName = shortName
+      self.longName = longName
+      self.description = description
+      self.looks = 0
+      print "New Thing %d " % Thing.thingCount + self.code
+      Thing.thingCount += 1
+   
+   def displayCount(self):
+     print "Total Things %d" % Thing.thingCount
+
+   def displayThing(self):
+      self.looks +=1
+      if self.looks < 2:
+        print " " + self.longName
+      else:
+        print " " + self.shortName
+ 
+
+
+class Location:
+   'Common base class for all locations'
+   locCount = 0
+
+   def __init__(self, code, shortName, longName):
+      self.code = code
+      self.shortName = shortName
+      self.longName = longName
+      self.looks = 0
+      self.thingCount = 0
+      self.objects = []
+      print "New Location %d " % Location.locCount + self.code
+      Location.locCount += 1
+   
+   def displayCount(self):
+     print "Total Locations %d" % Location.locCount
+
+   def displayThings(self):
+      if self.thingCount > 0 :
+         print 'There is also ..'
+         for i in range( 0, self.thingCount ):
+               #print i
+               #print self.objects[i].code
+               self.objects[i].displayThing()
+
+   def displayLocation(self):
+      self.looks +=1
+      if self.looks < 2:
+        print self.longName
+      else:
+        print self.shortName
+      self.displayThings()  
+
+   def addObject(self, thing):
+
+     self.objects.append(thing)
+     print "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount
+     self.thingCount +=1
+
+
+     
+        
+
+print 'START DEMO'        
+Locations = [
+   Location('INHUT','In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.')
+   ,Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food. A path leads East.')
+   ,Location('HUT','Near the Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.')
+   ,Location('STREAM','By a Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.')
+   ,Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.  A door leads out.')
+   ,Location('INVENT','Inventory','This is just a location to hold your gear.')
+       ] 
+
+Locations[0].addObject(Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.'))
+Locations[0].addObject(Thing('LAMP','A Lamp','An old oil Lamp','It is glowing softly.'))
+Locations[0].displayLocation()
+Locations[0].displayLocation()
+Locations[1].displayLocation()
+Locations[1].displayLocation()
+#print
+#print "Things at Location 1"
+#Locations[1].displayThings()
+#print
+Locations[2].displayLocation()
+Locations[2].displayLocation()
+Locations[1].displayCount()
+print Location.locCount
+
+
+print 'END DEMO' 
+print
+
 InHut = ['In Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.',{'OUT':"hUT"},StuffDesc[0]]
 Village = ['Village','You have arrived at a village. A path leads East.',{'EAST':'Hut'}]
 Hut = ['Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.',{'SOUTH':'Stream','WEST':'Village','DOOR':'In Hut'}]
 Stream = ['Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.',{'NORTH':'Hut'}, [StuffDesc[2],StuffDesc[3],StuffDesc[4]]]
 current_location = [Stream]
+
+
+
 
 #storyline
 print 'You have just woken up. Your'
@@ -94,7 +195,7 @@ while Decis != TERMINATE:
         GotWhat = ""
         Thing = Decis.split()[1]
         for i in range( FIRST_STUFF, MAX_STUFF ):
-            StuffName = StuffDesc[i].upper()
+            Stuff = StuffDesc[i].upper()
 
             if StuffLocation[i] == Location and (StuffName == Thing or Thing == 'ALL'):
                 StuffLocation[i] = INVENTORY
