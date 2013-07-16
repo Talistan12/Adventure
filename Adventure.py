@@ -32,6 +32,60 @@ class Thing:
         print " " + self.shortName
  
 
+class Way:
+   'Common base class for all ways between locations'
+   #locCount = 0
+
+   def __init__(self, shortWay, longWay, shortDesc, longDesc, movingDesc ,destLoc, hidden):
+      self.shortWay = shortWay
+      self.longWay = longWay
+      self.shortDesc = shortDesc
+      self.longDesc = longDesc
+      self.movingDesc = movingDesc
+      self.destLoc = destLoc
+      self.hidden = hidden
+      self.looks = 0
+      #self.thingCount = 0
+      #self.objects = []
+      print "New Way " + shortWay + " to " + destLoc
+      #Location.locCount += 1
+
+   def displayWay(self):
+      if not self.hidden:
+        #print " " + self.shortDesc
+        self.looks +=1
+        if self.looks < 2:
+          print " " + self.longDesc
+        else:
+         print " " + self.shortDesc
+   
+   #def displayCount(self):
+ #    print "Total Locations %d" % Location.locCount
+
+ #  def displayThings(self):
+ #     if self.thingCount > 0 :
+ #        print 'There is also ..'
+ #        for i in range( 0, self.thingCount ):
+ #              #print i
+ #              #print self.objects[i].code
+ #              self.objects[i].displayThing()
+
+ #  def displayLocation(self):
+ #     self.looks +=1
+ #     if self.looks < 2:
+ #       print self.longName
+ #     else:
+ #       print self.shortName
+ #     self.displayThings()  
+
+ #  def addObject(self, thing):
+#
+ #    self.objects.append(thing)
+ #    print "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount
+ #    self.thingCount +=1
+
+
+
 
 class Location:
    'Common base class for all locations'
@@ -44,6 +98,8 @@ class Location:
       self.looks = 0
       self.thingCount = 0
       self.objects = []
+      self.wayCount = 0
+      self.ways = []
       print "New Location %d " % Location.locCount + self.code
       Location.locCount += 1
    
@@ -58,19 +114,35 @@ class Location:
                #print self.objects[i].code
                self.objects[i].displayThing()
 
+
+   def displayWays(self):
+      if self.wayCount > 0 :
+         print 'Exits lead ..'
+         for i in range( 0, self.wayCount ):
+              self.ways[i].displayWay() 
+
    def displayLocation(self):
       self.looks +=1
       if self.looks < 2:
         print self.longName
       else:
         print self.shortName
-      self.displayThings()  
+      self.displayWays()
+      self.displayThings()
+      
 
    def addObject(self, thing):
 
      self.objects.append(thing)
      print "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount
      self.thingCount +=1
+
+   def addWay(self, way):
+
+     self.ways.append(way)
+     print "Added " + way.shortWay + " to " + self.code + " as it's way %d " % self.wayCount
+     self.wayCount +=1
+     
 
 class Landscape:
    'place to put the locations'
@@ -118,7 +190,12 @@ class Landscape:
                if self.locations[i].code == locCode:
                      self.locations[i].addObject(thing)
         
-
+   def addWayAtLocation(self,way,locCode):
+      if self.locCount > 0 :
+         print 'Finding location..'
+         for i in range( 0, self.locCount ):
+               if self.locations[i].code == locCode:
+                     self.locations[i].addWay(way)
    
         
 
@@ -164,7 +241,9 @@ Adventure.addLocation(Location('INVENT','Inventory','This is just a location to 
 
 
 Adventure.addThingAtLocation(Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.'),'INHUT')
-Adventure.addThingAtLocation(Thing('LAMP','A Lamp','An old oil Lamp','It is glowing softly.'),'INHUT') 
+Adventure.addThingAtLocation(Thing('LAMP','A Lamp','An old oil Lamp','It is glowing softly.'),'INHUT')
+Adventure.addWayAtLocation(Way('OUT','DOOR','Out','Out front door','The door creaks as you leave','HUT',False),'INHUT')
+Adventure.addWayAtLocation(Way('UP','GO UP','Up','Up a ladder to the ceiling','You climb into the ceiling','ATTIC',False),'INHUT')
 
 Adventure.listLocations()
 
