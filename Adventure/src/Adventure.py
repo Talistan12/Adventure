@@ -1,18 +1,41 @@
-Location = "Stream"
+from Location import Location
+
+CurrentLocation = "Stream"
 Decis    = "Go"
 INVENTORY = "Inventory"
 StuffDesc = ["Lamp","Serrated knife","Apple","Water","Rations","Ale"]
 StuffLocation = ["InHut","InHut","Tavern","Stream","Stream","Tavern"]
+money = 0
 FIRST_STUFF = 0
 MAX_STUFF = 6
 TERMINATE = "STOP"
 
-InHut = ['In Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.',{'OUT':"hUT"},StuffDesc[0]]
-Village = ['Village','You have arrived at a village. A path leads East.',{'EAST':'Hut'}]
-Hut = ['Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.',{'SOUTH':'Stream','WEST':'Village','DOOR':'In Hut'}]
-Stream = ['Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.',{'NORTH':'Hut'}, [StuffDesc[2],StuffDesc[3],StuffDesc[4]]]
-current_location = [Stream]
+#InHut = ['In Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.',{'OUT':"hUT"},StuffDesc[0]]
+Tavern = Location("Tavern",
+                  'you have arrived at a tavern bustling with people. It is called the Jolly Pig. A door leads out.',
+                  {'OUT':'Village'},
+                  [StuffDesc[3],StuffDesc[5]])
+InHut = Location( 'In Hut',
+                  'You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.',
+                  {'OUT':"Hut"},
+                  [StuffDesc[0],StuffDesc[1]] )
 
+Village = Location('Village',
+                   'You have arrived at a village. A path leads East.',
+                   {'EAST':'Hut','IN TAVERN':'Tavern'},
+                   [])
+Hut = Location('Hut',
+               'You are standing outside a little hut.  The front door is ajar.  A path leads South and West.',
+               {'SOUTH':'Stream','WEST':'Village',
+                'DOOR':'In Hut'},[])
+Stream = Location('Stream',
+          'You are standing by a stream. The stream runs NE to SW. A path leads North.',
+          {'NORTH':'Hut'},
+           [StuffDesc[3], StuffDesc[4]])
+current_location = Stream
+
+#current_location.visit()
+print current_location.visit()
 #storyline
 print 'You have just woken up. Your'
 print "memory is hazy and you can't "
@@ -33,26 +56,26 @@ print 'You are a wanderer whose aim in life is too collect things. Your goal. Co
 while Decis != TERMINATE:
       print
       #Tell the adventurer where they are.
-      if Location == "Stream" :
-          print Stream[1]
-      elif Location == "Hut" :
+      if CurrentLocation == "Stream" :
+          print Stream.Description
+      elif CurrentLocation == "Hut" :
           print 'You are standing outside a little hut.  The front door is ajar.  A path leads South and West.'
-      elif Location == "InHut" :
+      elif CurrentLocation == "InHut" :
           print 'You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.'
-      elif Location == "Village":
+      elif CurrentLocation == "Village":
           print 'You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maye you could get some ale and food. A path leads East.'
-      elif Location == "Tavern":
+      elif CurrentLocation == "Tavern":
             print 'you have arrived at a tavern bustling with people. It is called the Jolly Pig. A door leads out.'
                         
       #list any stuff which has a location matching where we are now.     
       is_stuff_there = False
       for i in range( FIRST_STUFF, MAX_STUFF ):        
-          if StuffLocation[i] == Location:
+          if StuffLocation[i] == CurrentLocation:
               is_stuff_there = True
       if is_stuff_there == True:                        
           print 'There is also ..'
       for i in range( FIRST_STUFF, MAX_STUFF ):                  
-          if StuffLocation[i] == Location:
+          if StuffLocation[i] == CurrentLocation:
             print " " + StuffDesc[i]                  
            
       Decis = raw_input ('What now?')
@@ -60,29 +83,29 @@ while Decis != TERMINATE:
  
     #process their input
     
-      if Location == "Stream" and Decis == 'N' or Decis == 'NORTH':
-            Location = "Hut"
+      if CurrentLocation == "Stream" and Decis == 'N' or Decis == 'NORTH':
+            CurrentLocation = "Hut"
             print 'Off I go'
-      elif Location == "Hut" and Decis == 'S' or Decis == 'SOUTH':
-            Location = "Stream"  
+      elif CurrentLocation == "Hut" and Decis == 'S' or Decis == 'SOUTH':
+            CurrentLocation = "Stream"  
             print 'Off I go'
-      elif Location == "Hut" and Decis == 'W' or Decis == 'WEST':
-            Location = 'Village'
+      elif CurrentLocation == "Hut" and Decis == 'W' or Decis == 'WEST':
+            CurrentLocation = 'Village'
             print 'Off I go'
-      elif Location == "Hut" and (Decis == 'IN' or Decis == 'DOOR'):
-            Location = "InHut"  
+      elif CurrentLocation == "Hut" and (Decis == 'IN' or Decis == 'DOOR'):
+            CurrentLocation = "InHut"  
             print 'In I go'
-      elif Location == "InHut" and (Decis == 'OUT' or Decis == 'DOOR'):
-            Location = "Hut"  
+      elif CurrentLocation == "InHut" and (Decis == 'OUT' or Decis == 'DOOR'):
+            CurrentLocation = "Hut"  
             print 'Out I go'
-      elif Location == "Village" and Decis == 'E':
-            Location = 'Hut'
+      elif CurrentLocation == "Village" and Decis == 'E':
+            CurrentLocation = 'Hut'
             print 'Off I go'  
-      elif Location == "Village" and Decis == 'IN TAVERN':
-            Location = "Tavern"
+      elif CurrentLocation == "Village" and Decis == 'IN TAVERN':
+            CurrentLocation = "Tavern"
             print "In I go"
-      elif Location == "Tavern" and (Decis == 'OUT' or Decis == 'DOOR'):
-            Location = "Village"
+      elif CurrentLocation == "Tavern" and (Decis == 'OUT' or Decis == 'DOOR'):
+            CurrentLocation = "Village"
             print 'Out I go'
       elif Decis == 'NORTH' or Decis == 'SOUTH' or Decis == 'EAST' or Decis == 'WEST' or Decis == 'N' or Decis == 'S' or Decis == 'E' or Decis == 'W'or Decis == 'NW' or Decis == 'NE' or Decis == 'SW' or Decis == 'SE':
             print 'You cannot go that way'
@@ -96,7 +119,7 @@ while Decis != TERMINATE:
         for i in range( FIRST_STUFF, MAX_STUFF ):
             StuffName = StuffDesc[i].upper()
 
-            if StuffLocation[i] == Location and (StuffName == Thing or Thing == 'ALL'):
+            if StuffLocation[i] == CurrentLocation and (StuffName == Thing or Thing == 'ALL'):
                 StuffLocation[i] = INVENTORY
                 GotIt = True
                 print 'Got ' + StuffDesc[i] + '!'
@@ -119,10 +142,10 @@ while Decis != TERMINATE:
             StuffName = StuffDesc[i].upper()
 
             if StuffLocation[i] == INVENTORY and (StuffName == Thing or Thing == 'ALL'):
-                StuffLocation[i] = Location
+                StuffLocation[i] = CurrentLocation
                 DroppedIt = True
                 print 'Dropped ' + StuffDesc[i] + '!' 
-            elif StuffLocation[i] == Location and StuffName == Thing:
+            elif StuffLocation[i] == CurrentLocation and StuffName == Thing:
                 print "I don't have " +  StuffDesc[i].lower() + ' but I can see it!'
                 DroppedIt = True
                 
