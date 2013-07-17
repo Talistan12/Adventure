@@ -1,11 +1,22 @@
 Loc = "Stream"
 Decis    = "Go"
-INVENTORY = "Inventory"
-StuffDesc = ["Lamp","Serrated knife","Apple","Water","Rations","Ale"]
-StuffLoc = ["InHut","InHut","Tavern","Stream","Stream","Tavern"]
-FIRST_STUFF = 0
-MAX_STUFF = 6
+##INVENTORY = "Inventory"
+##StuffDesc = ["Lamp","Serrated knife","Apple","Water","Rations","Ale"]
+##StuffLoc = ["InHut","InHut","Tavern","Stream","Stream","Tavern"]
+##FIRST_STUFF = 0
+##MAX_STUFF = 6
 TERMINATE = "STOP"
+
+DEBUGGING = False
+
+def debug( str ):
+   if DEBUGGING:
+     print str;
+   return;
+
+class userException(RuntimeError):
+   def __init__(self, arg):
+      self.args = arg
 
 
 class Thing:
@@ -18,7 +29,7 @@ class Thing:
       self.longName = longName
       self.description = description
       self.looks = 0
-      print "New Thing %d " % Thing.thingCount + self.code
+      debug( "New Thing %d " % Thing.thingCount + self.code )
       Thing.thingCount += 1
    
    def displayCount(self):
@@ -34,9 +45,7 @@ class Thing:
 
 class Way:
    'Common base class for all ways between locations'
-   #locCount = 0
-
-   def __init__(self, shortWay, longWay, shortDesc, longDesc, movingDesc ,destLoc, hidden):
+   def __init__(self, shortWay, longWay, shortDesc, longDesc, movingDesc ,destLoc, hidden = False):
       self.shortWay = shortWay
       self.longWay = longWay
       self.shortDesc = shortDesc
@@ -45,46 +54,16 @@ class Way:
       self.destLoc = destLoc
       self.hidden = hidden
       self.looks = 0
-      #self.thingCount = 0
-      #self.objects = []
-      print "New Way " + shortWay + " to " + destLoc
-      #Location.locCount += 1
+      debug( "New Way " + shortWay + " to " + destLoc)
 
    def displayWay(self):
       if not self.hidden:
-        #print " " + self.shortDesc
         self.looks +=1
         if self.looks < 2:
           print " " + self.longDesc
         else:
          print " " + self.shortDesc
-   
-   #def displayCount(self):
- #    print "Total Locations %d" % Location.locCount
-
- #  def displayThings(self):
- #     if self.thingCount > 0 :
- #        print 'There is also ..'
- #        for i in range( 0, self.thingCount ):
- #              #print i
- #              #print self.objects[i].code
- #              self.objects[i].displayThing()
-
- #  def displayLocation(self):
- #     self.looks +=1
- #     if self.looks < 2:
- #       print self.longName
- #     else:
- #       print self.shortName
- #     self.displayThings()  
-
- #  def addObject(self, thing):
-#
- #    self.objects.append(thing)
- #    print "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount
- #    self.thingCount +=1
-
-
+ 
 
 
 class Location:
@@ -100,7 +79,7 @@ class Location:
       self.objects = []
       self.wayCount = 0
       self.ways = []
-      print "New Location %d " % Location.locCount + self.code
+      debug( "New Location %d " % Location.locCount + self.code)
       Location.locCount += 1
    
    def displayCount(self):
@@ -108,20 +87,21 @@ class Location:
 
    def displayThings(self):
       if self.thingCount > 0 :
+         print
          print 'There is also ..'
          for i in range( 0, self.thingCount ):
-               #print i
-               #print self.objects[i].code
                self.objects[i].displayThing()
 
 
    def displayWays(self):
       if self.wayCount > 0 :
+         print
          print 'Exits lead ..'
          for i in range( 0, self.wayCount ):
               self.ways[i].displayWay() 
 
    def displayLocation(self):
+      print
       self.looks +=1
       if self.looks < 2:
         print self.longName
@@ -134,15 +114,23 @@ class Location:
    def addObject(self, thing):
 
      self.objects.append(thing)
-     print "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount
+     debug( "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount)
      self.thingCount +=1
 
    def addWay(self, way):
 
      self.ways.append(way)
-     print "Added " + way.shortWay + " to " + self.code + " as it's way %d " % self.wayCount
+     debug( "Added " + way.shortWay + " to " + self.code + " as it's way %d " % self.wayCount)
      self.wayCount +=1
-     
+
+   def findWay(self, wayCommand):
+      debug( 'Searching for way.. ' + wayCommand)
+      if self.wayCount > 0 :
+         for i in range( 0, self.wayCount ):
+               if self.ways[i].shortWay == wayCommand or self.ways[i].longWay == wayCommand:
+                  print self.ways[i].movingDesc
+                  return self.ways[i].destLoc
+      return "NOTFOUND"
 
 class Landscape:
    'place to put the locations'
@@ -155,19 +143,13 @@ class Landscape:
       self.looks = 0
       self.LocCount = 0
       self.locations = []
-      #print "New Location %d " % Location.locCount + self.code
-      #Location.locCount += 1
-      print "initilize the landscape"
-   
-   #def displayCount(self):
-   #  print "Total Locations %d" % Location.locCount
+      debug ("Initilizing the landscape")
+
 
    def listLocations(self):
       if self.locCount > 0 :
          print 'Display all locations..'
          for i in range( 0, self.locCount ):
-               #print i
-               #print self.objects[i].code
                self.locations[i].displayLocation()
 
    def displayLandscape(self):
@@ -180,83 +162,122 @@ class Landscape:
 
    def addLocation(self, location):
      self.locations.append(location)
-     print "Added " + location.code + " to " + self.code + " as it's location %d " % self.locCount
+     debug( "Added " + location.code + " to " + self.code + " as it's location %d " % self.locCount)
      self.locCount +=1
-     
-   def addThingAtLocation(self,thing,locCode):
+
+   def getLocation(self, locCode):
+      debug( 'Searching for location.. ' + locCode)
       if self.locCount > 0 :
-         print 'Finding location..'
          for i in range( 0, self.locCount ):
                if self.locations[i].code == locCode:
-                     self.locations[i].addObject(thing)
+                     return self.locations[i]
+                  
+      #raise "Location Not Found" ,locCode
+      raise userException("Location Not Found")
+ 
+   def locationAddObject(self,locCode,thing):
+      try:
+          Loc = self.getLocation(locCode)
+          Loc.addObject(thing)
+      #except "Location Not Found", arg:
+      except userException,e:
+          print e.args
+
+
+##try:
+##   raise Networkerror("Bad hostname")
+##except Networkerror,e:
+##   print e.args
+
+   
         
-   def addWayAtLocation(self,way,locCode):
-      if self.locCount > 0 :
-         print 'Finding location..'
-         for i in range( 0, self.locCount ):
-               if self.locations[i].code == locCode:
-                     self.locations[i].addWay(way)
+      
+##      if self.locCount > 0 :
+##         debug( 'Finding location.. ' + locCode)
+##         for i in range( 0, self.locCount ):
+##               if self.locations[i].code == locCode:
+##                     self.locations[i].addObject(thing)
+        
+   def locationAddWay(self,locCode,way):
+      try:
+          Loc = self.getLocation(locCode) 
+          Loc.addWay(way)
+##      except "Location Not Found", arg:
+##          print "Couldn't find " + arg
+      except userException,e:
+          print e.args
+
+ 
+##      if self.locCount > 0 :
+##         debug( 'Finding location.. ' + locCode)
+##         for i in range( 0, self.locCount ):
+##               if self.locations[i].code == locCode:
+##                     self.locations[i].addWay(way)
    
         
 
-print 'START DEMO1 - In this demo Locations are put together in a list of Locations'        
-Locations = [
-   Location('INHUT','In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.')
-   ,Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food. A path leads East.')
-   ,Location('HUT','Near the Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.')
-   ,Location('STREAM','By a Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.')
-   ,Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.  A door leads out.')
-   ,Location('INVENT','Inventory','This is just a location to hold your gear.')
-       ] 
-
-Locations[0].addObject(Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.'))
-Locations[0].addObject(Thing('LAMP','A Lamp','An old oil Lamp','It is glowing softly.'))
-Locations[0].displayLocation()
-Locations[0].displayLocation()
-Locations[1].displayLocation()
-Locations[1].displayLocation()
-#print
-#print "Things at Location 1"
-#Locations[1].displayThings()
-#print
-Locations[2].displayLocation()
-Locations[2].displayLocation()
-Locations[1].displayCount()
-print Location.locCount
-
-
-print 'END DEMO1' 
+##print 'START DEMO1 - In this demo Locations are put together in a list of Locations'        
+##Locations = [
+##   Location('INHUT','In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.')
+##   ,Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food. A path leads East.')
+##   ,Location('HUT','Near the Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.')
+##   ,Location('STREAM','By a Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.')
+##   ,Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.  A door leads out.')
+##   ,Location('INVENT','Inventory','This is just a location to hold your gear.')
+##       ] 
+##
+##Locations[0].addObject(Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.'))
+##Locations[0].addObject(Thing('LAMP','A Lamp','An old oil Lamp','It is glowing softly.'))
+##Locations[0].displayLocation()
+##Locations[0].displayLocation()
+##Locations[1].displayLocation()
+##Locations[1].displayLocation()
+###print
+###print "Things at Location 1"
+###Locations[1].displayThings()
+###print
+##Locations[2].displayLocation()
+##Locations[2].displayLocation()
+##Locations[1].displayCount()
+##print Location.locCount
+##
+##
+##print 'END DEMO1' 
 print
 
 
 print 'START DEMO2 - In this demo we keep the OO theme going and put all the locations into a parent object, doing away with the list of locations.'
 
 Adventure = Landscape("ADVENTURE","A Adventure","An amazing adventure")
-Adventure.addLocation(Location('INHUT','In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.'))
-Adventure.addLocation(Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food. A path leads East.'))
-Adventure.addLocation(Location('HUT','Near the Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.'))
-Adventure.addLocation(Location('STREAM','By a Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.'))
-Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.  A door leads out.'))
+Adventure.addLocation(Location('INHUT','In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.'))
+Adventure.addLocation(Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food.'))
+Adventure.addLocation(Location('HUT','Near the Hut','You are standing outside a little hut.  The front door is ajar.'))
+Adventure.addLocation(Location('STREAM','By a Stream','You are standing by a stream. The stream runs NE to SW.'))
+Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'))
 Adventure.addLocation(Location('INVENT','Inventory','This is just a location to hold your gear.'))
 
+Adventure.locationAddObject('STREAM',Thing('WATER','Some Water','A bottle of water','Not mineral water, but smells ok.'))
+Adventure.locationAddWay('STREAM',Way('N','NORTH','North','North by a narrow track','A short walk later ...','HUT'))
+Adventure.locationAddWay('HUT',Way('S','SOUTH','South','South by a narrow track','A short walk later ...','STREAM'))
+Adventure.locationAddObject('INHUT',Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.'))
+Adventure.locationAddObject('INHUT',Thing('LAMP','A Lamp','An old oil Lamp','It is glowing softly.'))
+Adventure.locationAddWay('INHUT',Way('OUT','DOOR','Out','Out front door','The door creaks as you leave','HUT'))
+Adventure.locationAddWay('INHUT',Way('UP','GO UP','Up','Up a ladder to the ceiling','You climb into the ceiling','ATTIC'))
+Adventure.locationAddWay('INHUT',Way('XYZZY','','Magic Word','Magic word unknown to adventurer','Wow! how did i get here?','STREAM',True))
 
-Adventure.addThingAtLocation(Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.'),'INHUT')
-Adventure.addThingAtLocation(Thing('LAMP','A Lamp','An old oil Lamp','It is glowing softly.'),'INHUT')
-Adventure.addWayAtLocation(Way('OUT','DOOR','Out','Out front door','The door creaks as you leave','HUT',False),'INHUT')
-Adventure.addWayAtLocation(Way('UP','GO UP','Up','Up a ladder to the ceiling','You climb into the ceiling','ATTIC',False),'INHUT')
+##Adventure.listLocations()
 
-Adventure.listLocations()
-
+currentLocation = Adventure.getLocation('STREAM')
 
 print 'END DEMO2' 
 print
 
 
-InHut = ['In Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.',{'OUT':"hUT"},StuffDesc[0]]
-Village = ['Village','You have arrived at a village. A path leads East.',{'EAST':'Hut'}]
-Hut = ['Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.',{'SOUTH':'Stream','WEST':'Village','DOOR':'In Hut'}]
-Stream = ['Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.',{'NORTH':'Hut'}, [StuffDesc[2],StuffDesc[3],StuffDesc[4]]]
-current_location = [Stream]
+##InHut = ['In Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.',{'OUT':"hUT"},StuffDesc[0]]
+##Village = ['Village','You have arrived at a village. A path leads East.',{'EAST':'Hut'}]
+##Hut = ['Hut','You are standing outside a little hut.  The front door is ajar.  A path leads South and West.',{'SOUTH':'Stream','WEST':'Village','DOOR':'In Hut'}]
+##Stream = ['Stream','You are standing by a stream. The stream runs NE to SW. A path leads North.',{'NORTH':'Hut'}, [StuffDesc[2],StuffDesc[3],StuffDesc[4]]]
+##current_location = [Stream]
 
 
 
@@ -281,57 +302,68 @@ print 'You are a wanderer whose aim in life is too collect things. Your goal. Co
 while Decis != TERMINATE:
       #print Loc
       #Tell the adventurer where they are.
-      if Loc == "Stream" :
-          print Stream[1]
-      elif Loc == "Hut" :
-          print 'You are standing outside a little hut.  The front door is ajar.  A path leads South and West.'
-      elif Loc == "InHut" :
-          print 'You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.'
-      elif Loc == "Village":
-          print 'You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maye you could get some ale and food. A path leads East.'
-      elif Loc == "Tavern":
-            print 'you have arrived at a tavern bustling with people. It is called the Jolly Pig. A door leads out.'
-                        
-      #list any stuff which has a Loc matching where we are now.     
-      is_stuff_there = False
-      for i in range( FIRST_STUFF, MAX_STUFF ):        
-          if StuffLoc[i] == Loc:
-              is_stuff_there = True
-      if is_stuff_there == True:                        
-          print 'There is also ..'
-      for i in range( FIRST_STUFF, MAX_STUFF ):                  
-          if StuffLoc[i] == Loc:
-            print " " + StuffDesc[i]                  
-           
+
+      currentLocation.displayLocation()
+         
+##      if Loc == "Stream" :
+##          print Stream[1]
+##      elif Loc == "Hut" :
+##          print 'You are standing outside a little hut.  The front door is ajar.  A path leads South and West.'
+##      elif Loc == "InHut" :
+##          print 'You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.  A door leads out.'
+##      elif Loc == "Village":
+##          print 'You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maye you could get some ale and food. A path leads East.'
+##      elif Loc == "Tavern":
+##            print 'you have arrived at a tavern bustling with people. It is called the Jolly Pig. A door leads out.'
+##                        
+##      #list any stuff which has a Loc matching where we are now.     
+##      is_stuff_there = False
+##      for i in range( FIRST_STUFF, MAX_STUFF ):        
+##          if StuffLoc[i] == Loc:
+##              is_stuff_there = True
+##      if is_stuff_there == True:                        
+##          print 'There is also ..'
+##      for i in range( FIRST_STUFF, MAX_STUFF ):                  
+##          if StuffLoc[i] == Loc:
+##            print " " + StuffDesc[i]                  
+
+      print     
       Decis = raw_input ('What now?')
       Decis = Decis.upper()
- 
+
+      newLocCode = currentLocation.findWay(Decis)
+      if newLocCode <> "NOTFOUND":
+        currentLocation = Adventure.getLocation(newLocCode)
+
+      
     #process their input
     
-      if Loc == "Stream" and Decis == 'N' or Decis == 'NORTH':
-            Loc = "Hut"
-            print 'Off I go'
-      elif Loc == "Hut" and Decis == 'S' or Decis == 'SOUTH':
-            Loc = "Stream"  
-            print 'Off I go'
-      elif Loc == "Hut" and Decis == 'W' or Decis == 'WEST':
-            Loc = 'Village'
-            print 'Off I go'
-      elif Loc == "Hut" and (Decis == 'IN' or Decis == 'DOOR'):
-            Loc = "InHut"  
-            print 'In I go'
-      elif Loc == "InHut" and (Decis == 'OUT' or Decis == 'DOOR'):
-            Loc = "Hut"  
-            print 'Out I go'
-      elif Loc == "Village" and Decis == 'E':
-            Loc = 'Hut'
-            print 'Off I go'  
-      elif Loc == "Village" and Decis == 'IN TAVERN':
-            Loc = "Tavern"
-            print "In I go"
-      elif Loc == "Tavern" and (Decis == 'OUT' or Decis == 'DOOR'):
-            Loc = "Village"
-            print 'Out I go'
+##      if Loc == "Stream" and Decis == 'N' or Decis == 'NORTH':
+##            Loc = "Hut"
+##            print 'Off I go'
+##      elif Loc == "Hut" and Decis == 'S' or Decis == 'SOUTH':
+##            Loc = "Stream"  
+##            print 'Off I go'
+##      elif Loc == "Hut" and Decis == 'W' or Decis == 'WEST':
+##            Loc = 'Village'
+##            print 'Off I go'
+##      elif Loc == "Hut" and (Decis == 'IN' or Decis == 'DOOR'):
+##            Loc = "InHut"  
+##            print 'In I go'
+##      elif Loc == "InHut" and (Decis == 'OUT' or Decis == 'DOOR'):
+##            Loc = "Hut"  
+##            print 'Out I go'
+##      elif Loc == "Village" and Decis == 'E':
+##            Loc = 'Hut'
+##            print 'Off I go'  
+##      elif Loc == "Village" and Decis == 'IN TAVERN':
+##            Loc = "Tavern"
+##            print "In I go"
+##      elif Loc == "Tavern" and (Decis == 'OUT' or Decis == 'DOOR'):
+##            Loc = "Village"
+##            print 'Out I go'
+
+            
       elif Decis == 'NORTH' or Decis == 'SOUTH' or Decis == 'EAST' or Decis == 'WEST' or Decis == 'N' or Decis == 'S' or Decis == 'E' or Decis == 'W'or Decis == 'NW' or Decis == 'NE' or Decis == 'SW' or Decis == 'SE':
             print 'You cannot go that way'
       elif Decis == 'GET':
