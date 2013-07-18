@@ -362,16 +362,23 @@ Adventure.locationAddWay('INHUT',Way('UP','GO UP','Up','Up a ladder to the ceili
 Adventure.locationAddWay('INHUT',Way('XYZZY','','Magic Word','Magic word unknown to adventurer','Wow! how did i get here?','STREAM',True))
 
 Adventure.addLocation(Location('ATTIC','In the Atttic','This is a dark hot place.'))
-Adventure.locationAddWay('ATTIC',Way('D','DOWN','Down','Down thru trapdoor','Going down','INHUT'))
+Adventure.locationAddWay('ATTIC',Way('D','DOWN','Down','Down threw the trapdoor','Going down','INHUT'))
 
 
 Adventure.addLocation(Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food.'))
 Adventure.locationAddWay('VILLAGE',Way('IN','IN TAVERN','In','In too the Tavern.',"You enter the Tavern with it's hot, stuffy air.",'TAVERN')) 
-Adventure.locationAddWay('VILLAGE',Way('E','East','East','East by a narrow track.',"A short walk later ...",'HUT')) 
+Adventure.locationAddWay('VILLAGE',Way('E','EAST','East','East by a narrow track.',"A short walk later ...",'HUT')) 
+Adventure.locationAddWay('VILLAGE',Way('N','NORTH','North','North by a thin, narrow track.','A short walk later ...','FOREST')) 
+
+Adventure.addLocation(Location('FOREST','At the Forest','You have arrived at a dark and spooky forest. There is a stench of somthing long dead, and no way back to the Village.'))
+Adventure.locationAddWay('FOREST',Way('N','NORTH','North','North by a thin, narrow track.',"A short walk later ...",'GRAVEYARD'))
+
+Adventure.addLocation(Location('GRAVEYARD','At the Graveyard','You have arrived at a dark, abandoned Graveyard. There is a stench of somthing long dead, and no way back to the Forest.'))
+Adventure.locationAddWay('GRAVEYARD',Way('PASS','PASSAGE','Secret Passage','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'VILLAGE'))
 
 Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'))
 Adventure.locationAddObject('TAVERN',Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.'))
-Adventure.locationAddWay('TAVERN',Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','ATTIC')) 
+Adventure.locationAddWay('TAVERN',Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE')) 
 
 
 Adventure.addLocation(Location('INVENT','Inventory','This is just a location to hold your gear.'))
