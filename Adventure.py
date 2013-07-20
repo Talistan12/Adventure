@@ -65,15 +65,16 @@ class Location:
    'Common base class for all locations'
    locCount = 0
 
-   def __init__(self, code, shortName, longName, ways = [], objects = []):
+   #def __init__(self, code, shortName, longName, ways = [], objects = []):
+   def __init__(self, code, shortName, longName ):
       self.code = code
       self.shortName = shortName
       self.longName = longName
       self.looks = 0
       self.thingCount = 0
-      self.objects = objects
+      self.objects = [] #objects
       self.wayCount = 0
-      self.ways = ways
+      self.ways = [] #ways
       debug( "New Location %d " % Location.locCount + self.code)
       Location.locCount += 1
    
@@ -86,17 +87,7 @@ class Location:
          print 'There is also ..'
          for i in range( 0, self.thingCount ):
                self.objects[i].displayThing()
-
-   def inventThings(self):
-      if self.thingCount > 0 :
-         print
-         print 'You are currently holding ..'
-         for i in range( 0, self.thingCount ):
-               self.objects[i].displayThing()
-      else:
-         print
-         print 'You have nothing.'
-
+ 
    def findThing(self,thingCode):
       if self.thingCount > 0 :
          for i in range( 0, self.thingCount ):
@@ -104,13 +95,7 @@ class Location:
                return self.objects[i]
       raise userException("No such thing")
  
-   def score(self):
-      myScore = 0
-      if self.thingCount > 0 :
-         for i in range( 0, self.thingCount ):
-           myScore += self.objects[i].valueGold * 10
-           
-      return myScore
+
   
    def displayWays(self, looks):
       if self.wayCount > 0 :
@@ -210,6 +195,62 @@ class Location:
       except userException,e:
          print "what? I can't pick " + thingCode.lower() + " up!"
 
+ 
+
+class Inventory:
+   'Common base class for all inventories'
+   invCount = 0
+
+   def __init__(self, code, shortName, longName, objects = []):
+      self.code = code
+      self.shortName = shortName
+      self.longName = longName
+      self.looks = 0
+      self.thingCount = 0
+      self.objects = objects
+      debug( "New Inventory %d " % Inventory.invCount + self.code)
+      Inventory.invCount += 1
+   
+   def displayCount(self):
+     print "Total Locations %d" % Inventory.invCount
+ 
+   def displayThings(self):
+      if self.thingCount > 0 :
+         print
+         print 'You are currently holding ..'
+         for i in range( 0, self.thingCount ):
+               self.objects[i].displayThing()
+      else:
+         print
+         print 'You have nothing.'
+
+   def findThing(self,thingCode):
+      if self.thingCount > 0 :
+         for i in range( 0, self.thingCount ):
+            if self.objects[i].code == thingCode:
+               return self.objects[i]
+      raise userException("No such thing")
+ 
+   def score(self):
+      myScore = 0
+      if self.thingCount > 0 :
+         for i in range( 0, self.thingCount ):
+           myScore += self.objects[i].valueGold * 10
+           
+      return myScore
+ 
+   def addObject(self, thing):
+
+     self.objects.append(thing)
+     debug( "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount)
+     self.thingCount +=1
+
+   def removeObject(self, thing):
+
+     self.objects.remove(thing)
+     debug( "Removed " + thing.code + " from " + self.code)
+     self.thingCount -=1
+ 
 
    def dropThing(self, location, getCommand):
       if getCommand == 'DROP':
@@ -255,11 +296,14 @@ class Location:
    
       except userException,e:
          print "You don't have " + thingCode.lower() + "!"
+
  
 
 class Landscape:
    'place to put the locations'
    locCount = 0
+   location = Location('','','')
+   inventory = Inventory('','','')
 
    def __init__(self, code, shortName, longName):
       self.code = code
@@ -316,35 +360,55 @@ class Landscape:
       except userException,e:
           print e.args
 
-
- 
-def interpretCommand(loc,inv):
-# All commands are processed here.  Returns a Location
-      print     
-      command = raw_input ('What next?')
-      command = command.upper()
-      try:
-          loc = loc.goWay(command)
-      except userException,e:
+   def interpretCommand(self):
+   # All commands are processed here.  Returns a Location
+         newLocation = self.location
+         print     
+         command = raw_input ('What next?')
+         command = command.upper()
          try:
-           loc.getThing(inv,command)
+             newLocation = self.location.goWay(command)
          except userException,e:
             try:
-                inv.dropThing(loc,command)
+              self.location.getThing(self.inventory,command)
             except userException,e:
-              try:
-                 if ( command in ['L','LOOK']):
-                    loc.looks = 0
-                 elif ( command in ['I','INVENT']):
-                    inv.inventThings()
-                 elif ( command in ['S','SCORE']):
-                    print "Your current score is " + str (inv.score() )
-                 else:
-                    inv.lookThing(command) #Look at an object in the inventory
-              except userException,e:
-                 print 'huh?'
-      finally:
-         return loc
+               try:
+                   self.inventory.dropThing(self.location,command)
+               except userException,e:
+                 try:
+                    if ( command in ['L','LOOK']):
+                       debug("recognised " + command)
+                       self.location.looks = 0
+                    elif ( command in ['I','INVENT']):
+                       debug("recognised " + command)
+                       self.inventory.displayThings()
+                    elif ( command in ['S','SCORE']):
+                       debug("recognised " + command)
+                       print "Your current score is " + str (self.inventory.score() )
+                    else:
+                       self.inventory.lookThing(command) #Look at an object in the inventory
+                 except userException,e:
+                    print 'huh?'
+         finally:
+            return newLocation
+
+
+
+   def doTurn(self):
+
+      #Tell the adventurer where they are.
+      self.location.displayLocation()
+
+      #Ask them what to do next
+      self.location = self.interpretCommand()
+
+
+
+
+
+
+
+ 
 
  
  
@@ -359,7 +423,7 @@ Adventure.locationAddObject('STREAM',Thing('RATIONS','Some Rations','A bag of Ra
 Adventure.locationAddWay('STREAM',Way('N','NORTH','North','North by a narrow track','A short walk later ...','HUT'))
 Adventure.locationAddWay('STREAM',Way('W','WEST','West','West by a narrow track','A short walk later ...','PALMFOREST'))
 
-Adventure.addLocation(Location('HUT','Near the Hut','You are standing outside a little hut.  The front door is ajar.'))
+Adventure.addLocation(Location('HUT','Near the Hut','You are standing outside a little hut.'))
 Adventure.locationAddWay('HUT',Way('S','SOUTH','South','South by a narrow track','A short walk later ...','STREAM'))
 Adventure.locationAddWay('HUT',Way('IN','DOOR','Inside','The front door is ajar.','The door creaks erily as you enter ...','INHUT'))
 Adventure.locationAddWay('HUT',Way('W','WEST','West','West by a narrow track','A short walk later ...','VILLAGE'))
@@ -403,20 +467,24 @@ Adventure.locationAddWay('CURSEDGLADE',Way('PASS','GRAVEYARD','Hidden Tunnel','U
 Adventure.locationAddObject('CURSEDGLADE',Thing('DIAMONDRING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',50))
 
  
-Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'
-                             ,[Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE')]
-                             ,[Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.')]))
+##Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'
+##                             ,[Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE')]
+##                             ,[Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.')]))
+##
 
- 
-Adventure.addLocation(Location('INVENT','Inventory','This is just a location to hold your gear, what are you doing here? You are sitting in your own bag and there is no way out.'))
-Adventure.locationAddObject('INVENT',Thing('NOTE','A Note','A interesting small note.','It reads,"XYZZY".'))
-
+Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'))
+Adventure.locationAddWay('TAVERN',Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE'))
+Adventure.locationAddObject('TAVERN',Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.'))
  
 
 ##Adventure.listLocations()
 
-currentLocation = Adventure.getLocation('STREAM')
-inventory       = Adventure.getLocation('INVENT')
+Adventure.location  = Adventure.getLocation('STREAM')
+##Adventure.inventory = Inventory('INVENT','Inventory','This is a set of stuff held by a character'
+##                           ,[Thing('NOTE','A Note','A interesting small note.','It reads,"XYZZY".')])
+
+Adventure.inventory = Inventory('INVENT','Inventory','This is a set of stuff held by a character')
+Adventure.inventory.addObject(Thing('NOTE','A Note','A interesting small note.','It reads,"XYZZY".'))
 
 
 
@@ -441,13 +509,9 @@ print ' in total. FIND THOSE OBJECTS!'
 raw_input('Press enter to continue.')
 
 #perpetual loop
-while 1 != 2:
+while True:
  
-      #Tell the adventurer where they are.
-      currentLocation.displayLocation()
-
-      #Ask them what to do next
-      currentLocation = interpretCommand(currentLocation,inventory)
+  Adventure.doTurn()
  
  
  
