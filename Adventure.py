@@ -65,16 +65,16 @@ class Location:
    'Common base class for all locations'
    locCount = 0
 
-   #def __init__(self, code, shortName, longName, ways = [], objects = []):
-   def __init__(self, code, shortName, longName ):
+   def __init__(self, code, shortName, longName):
       self.code = code
       self.shortName = shortName
       self.longName = longName
       self.looks = 0
       self.thingCount = 0
-      self.objects = [] #objects
+      self.objects = []  
       self.wayCount = 0
-      self.ways = [] #ways
+      self.ways = []
+ 
       debug( "New Location %d " % Location.locCount + self.code)
       Location.locCount += 1
    
@@ -401,16 +401,6 @@ class Landscape:
 
       #Ask them what to do next
       self.location = self.interpretCommand()
-
-
-
-
-
-
-
- 
-
- 
  
 print
 
@@ -467,11 +457,6 @@ Adventure.locationAddWay('CURSEDGLADE',Way('PASS','GRAVEYARD','Hidden Tunnel','U
 Adventure.locationAddObject('CURSEDGLADE',Thing('DIAMONDRING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',50))
 
  
-##Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'
-##                             ,[Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE')]
-##                             ,[Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.')]))
-##
-
 Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'))
 Adventure.locationAddWay('TAVERN',Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE'))
 Adventure.locationAddObject('TAVERN',Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.'))
@@ -480,8 +465,6 @@ Adventure.locationAddObject('TAVERN',Thing('ALE','Some Ale','A pint of Ale','Loo
 ##Adventure.listLocations()
 
 Adventure.location  = Adventure.getLocation('STREAM')
-##Adventure.inventory = Inventory('INVENT','Inventory','This is a set of stuff held by a character'
-##                           ,[Thing('NOTE','A Note','A interesting small note.','It reads,"XYZZY".')])
 
 Adventure.inventory = Inventory('INVENT','Inventory','This is a set of stuff held by a character')
 Adventure.inventory.addObject(Thing('NOTE','A Note','A interesting small note.','It reads,"XYZZY".'))
