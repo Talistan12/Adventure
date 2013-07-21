@@ -158,15 +158,14 @@ class Location:
       debug( 'Searching for way..[' + wayCode + ']')
       debug( 'way count ' + str ( self.wayCount() ) )
       debug( 'ways length ' + str( len(self.ways)) ) 
-      if self.wayCount() > 0:
-         debug( 'at least 1 way exists' )
-         for way in self.ways:
-               debug("Check way " + way.shortDesc)
-               if wayCode in way.wayCodes:
-                  print
-                  print way.movingDesc
-                  debug(way.destLoc)
-                  return Adventure.getLocation(way.destLoc)
+      #   debug( 'at least 1 way exists' )
+      for way in self.ways:
+          debug("Check way " + way.shortDesc)
+          if wayCode in way.wayCodes:
+			      print
+			      print way.movingDesc
+			      debug(way.destLoc)
+			      return Adventure.getLocation(way.destLoc)
                
       debug( 'Does it get here?')
       if ( wayCode in ['NORTH','SOUTH','EAST','WEST','N','S','E','W','NW','NE','SW','SE','UP','DOWN','IN','OUT','OVER','UNDER','THRU','AROUND']):
@@ -198,10 +197,8 @@ class Location:
 
  
       GotIt = False
-      if self.thingCount() > 0 :
-          debug( 'At least 1 thing found')
-          for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
-              if thingCode in ['ALL',thing.code]:
+      for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
+          if thingCode in ['ALL',thing.code]:
                  print 'Got ' + thing.shortName + '!'
                  #add thing to inventory
                  inventory.addThing(thing)
@@ -251,16 +248,14 @@ class Inventory:
          print 'You have nothing.'
  
    def findThing(self,thingCode):
-      if self.thingCount() > 0 :
          for thing in self.things:
             if thing.code == thingCode:
                return thing
-      raise userException("No such thing")
+         raise userException("No such thing")
  
    def score(self):
       myScore = 0
-      if self.thingCount() > 0 :
-         for thing in self.things:
+      for thing in self.things:
            myScore += thing.valueGold * 10
            
       return myScore
@@ -297,9 +292,7 @@ class Inventory:
       debug( 'Searching for thing to drop.. ' + thingCode)
  
       DroppedIt = False
-      if self.thingCount() > 0 :
-          debug( 'At least 1 thing found')
-          for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
+      for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
               if thingCode in ['ALL',thing.code]:
                  print 'Dropped ' + thing.shortName + '!'
                  #add thing to location
@@ -370,8 +363,7 @@ class Landscape:
 
    def getLocation(self, locCode):
       debug( 'Searching for location.. ' + locCode)
-      if self.locCount() > 0 :
-         for location in self.locations:
+      for location in self.locations:
                if location.code == locCode:
                      debug( 'Found ' + locCode)
                      return location
