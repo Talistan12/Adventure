@@ -32,17 +32,16 @@ class Thing:
 
 class Way:
    'Common base class for all ways between locations'
-   def __init__(self, shortWay, longWay, shortDesc, longDesc, movingDesc ,destLoc, hidden = False):
-      self.shortWay = shortWay
-      self.longWay = longWay
+   def __init__(self, wayCodes, shortDesc, longDesc, movingDesc ,destLoc, hidden = False):
+      self.wayCodes = wayCodes
       self.shortDesc = shortDesc
       self.longDesc = longDesc
       self.movingDesc = movingDesc
       self.destLoc = destLoc
       self.hidden = hidden
       self.looks = 0
-      debug( "New Way " + shortWay + " to " + destLoc)
-
+      debug( "New Way " + shortDesc + " to " + destLoc)
+ 
    def displayWay(self,looks):
       if not self.hidden:
         #self.looks +=1
@@ -54,68 +53,76 @@ class Way:
  
 
 
- 
+
 
 class Inventory:
    'Common base class for all inventories'
    invCount = 0
 
-   def __init__(self, code, shortName, longName, objects = []):
+   def __init__(self, code, shortName, longName, things = []):
       self.code = code
       self.shortName = shortName
       self.longName = longName
       self.looks = 0
-      self.thingCount = 0
-      self.objects = objects
+      if len(things) == 0:
+         self.things = []
+      else: self.things = things       
       debug( "New Inventory %d " % Inventory.invCount + self.code)
       Inventory.invCount += 1
+
+   def thingCount(self):
+     return len(self.things)
    
    def displayCount(self):
      print "Total Locations %d" % Inventory.invCount
  
    def displayThings(self):
-      if self.thingCount > 0 :
+      if self.thingCount() > 0 :
          print
          print 'You are currently holding ..'
-         for i in range( 0, self.thingCount ):
-               self.objects[i].displayThing()
+         for thing in self.things:
+            thing.displayThing()
       else:
          print
          print 'You have nothing.'
-
+ 
    def findThing(self,thingCode):
-      if self.thingCount > 0 :
-         for i in range( 0, self.thingCount ):
-            if self.objects[i].code == thingCode:
-               return self.objects[i]
-      raise userException("No such thing")
+         for thing in self.things:
+            if thing.code == thingCode:
+               return thing
+         raise userException("No such thing")
  
    def score(self):
       myScore = 0
-      if self.thingCount > 0 :
-         for i in range( 0, self.thingCount ):
-           myScore += self.objects[i].valueGold * 10
+      for thing in self.things:
+           myScore += thing.valueGold * 10
            
       return myScore
  
-   def addObject(self, thing):
+   def addThing(self, thing):
 
-     self.objects.append(thing)
-     debug( "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount)
-     self.thingCount +=1
-
-   def removeObject(self, thing):
-
-     self.objects.remove(thing)
-     debug( "Removed " + thing.code + " from " + self.code)
-     self.thingCount -=1
+     self.things.append(thing)
+     debug( "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount())
  
+   def removeThing(self, thing):
+
+     self.things.remove(thing)
+     debug( "Removed " + thing.code + " from " + self.code)
+
 
    def dropThing(self, location, getCommand):
+
       if getCommand == 'DROP':
-         print 'Drop what?'
-         return
-      
+         if self.thingCount() == 1 :
+           thingCode = 'ALL'
+         elif self.thingCount() == 0:
+           print 'You have nothing to drop.'
+           return
+         else:
+           print 'Drop what?'
+           self.displayThings()
+           return
+  
       elif getCommand.split()[0] == 'DROP':
          thingCode = getCommand.split()[1]
       else:
@@ -124,17 +131,15 @@ class Inventory:
       debug( 'Searching for thing to drop.. ' + thingCode)
  
       DroppedIt = False
-      if self.thingCount > 0 :
-           for k in range( self.thingCount, 0, -1 ): #step backwards because removing items from the list changes the indexes.
-              i = k-1
-              debug( str( i ) )
-              if self.objects[i].code == thingCode or thingCode == 'ALL':
-                 print 'Drop ' +self.objects[i].shortName + '!'
-                 #add object to location
-                 location.addObject(self.objects[i])
-                 #remove object from inventory
-                 self.removeObject(self.objects[i])
+      for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
+              if thingCode in ['ALL',thing.code]:
+                 print 'Dropped ' + thing.shortName + '!'
+                 #add thing to location
+                 location.addThing(thing)
+                 #remove thing from inventory
+                 self.removeThing(thing)
                  DroppedIt = True
+
       try:
         if not DroppedIt:
           Thing = location.findThing(thingCode)
@@ -156,27 +161,34 @@ class Inventory:
       except userException,e:
          print "You don't have " + thingCode.lower() + "!"
 
+ 
+
 class Landscape:
    'place to put the locations'
    locCount = 0
+   location = Location('','','')
    # characters = Character('','','')
    mainCharacter = None
+
+   inventory = Inventory('','','')
 
    def __init__(self, code, shortName, longName):
       self.code = code
       self.shortName = shortName
       self.longName = longName
       self.looks = 0
-      self.LocCount = 0
-      self.locations = []
-      debug ("Initilizing the landscape")
+      self.LocCount = 0      self.locations = []
+      debug ("Initialising the landscape")
+
+   def locCount(self):
+     return len(self.locations)
 
 
    def listLocations(self):
-      if self.locCount > 0 :
+      if self.locCount() > 0 :
          print 'Display all locations..'
-         for i in range( 0, self.locCount ):
-               self.locations[i].displayLocation()
+         for location in self.locations:
+               location.displayLocation()
 
    def displayLandscape(self):
       self.looks +=1
@@ -188,40 +200,41 @@ class Landscape:
 
    def addLocation(self, location):
      self.locations.append(location)
-     debug( "Added " + location.code + " to " + self.code + " as it's location %d " % self.locCount)
-     self.locCount +=1
+     debug( "Added " + location.code + " to " + self.code + " as it's location %d " % self.locCount())
+ 
 
    def getLocation(self, locCode):
       debug( 'Searching for location.. ' + locCode)
-      if self.locCount > 0 :
-         for i in range( 0, self.locCount ):
-               if self.locations[i].code == locCode:
+      for location in self.locations:
+               if location.code == locCode:
                      debug( 'Found ' + locCode)
-                     return self.locations[i]
+                     return location
  
       raise userException("Location Not Found")
  
+
    def goWay(self, fromLocation, wayCommand):
       #returns a Location unless an exception is raised.
       if wayCommand == 'GO':
          print 'Go where?'
+         print fromLocation.displayWays(0)
          return fromLocation 
       
       elif wayCommand.split()[0] == 'GO':
-         wayCode = wayCommand.split()[1]
+          wayCode = wayCommand.split().remove('GO')
       else:
          wayCode = wayCommand
 
       debug( 'Searching for way.. ' + wayCode)
       debug( 'way count ' + str (fromLocation.wayCount) )
-      if fromLocation.wayCount > 0 :
-         for i in range( 0, fromLocation.wayCount ):
-               if fromLocation.ways[i].shortWay == wayCode or fromLocation.ways[i].longWay == wayCode:
-                  print
-                  print fromLocation.ways[i].movingDesc
-                  debug(fromLocation.ways[i].destLoc)
-                  return self.getLocation(fromLocation.ways[i].destLoc)
-
+      for way in fromLocation.ways:
+          debug("Check way " + way.shortDesc)
+          if wayCode in way.wayCodes:
+			      print
+			      print way.movingDesc
+			      debug(way.destLoc)
+			      return self.getLocation(way.destLoc)  
+ 
       debug( 'Does it get here?')
       if ( wayCode in ['NORTH','SOUTH','EAST','WEST','N','S','E','W','NW','NE','SW','SE','UP','DOWN','IN','OUT','OVER','UNDER','THRU','AROUND']):
             print 'You cannot go ' + wayCode.lower()
@@ -229,11 +242,12 @@ class Landscape:
          
       debug( 'Non-Directional')
       raise userException("Non-Directional")
-               
-   def locationAddObject(self,locCode,thing):
+
+
+   def locationAddThing(self,locCode,thing):
       try:
           Loc = self.getLocation(locCode)
-          Loc.addObject(thing)
+          Loc.addThing(thing)
  
       except userException,e:
           print e.args
@@ -293,60 +307,100 @@ print
 Adventure = Landscape("ADVENTURE","An Adventure","An amazing adventure")
 
 Adventure.addLocation(Location('STREAM','By a Stream','You are standing by a stream. The stream runs NE to SW.'))
-Adventure.locationAddObject('STREAM',Thing('WATER','Some Water','A bottle of water','Not mineral water, but smells ok.'))
-Adventure.locationAddObject('STREAM',Thing('APPLE','An Apple','A juicy looking Apple',"It is pulsating strangely. I'd better not eat it."))
-Adventure.locationAddObject('STREAM',Thing('RATIONS','Some Rations','A bag of Rations.',"The Rations look stale, but there all I've got till I reach an Inn or a Tavern"))
-Adventure.locationAddWay('STREAM',Way('N','NORTH','North','North by a narrow track','A short walk later ...','HUT'))
-Adventure.locationAddWay('STREAM',Way('W','WEST','West','West by a narrow track','A short walk later ...','PALMFOREST'))
+Adventure.locationAddThing('STREAM',Thing('WATER','Some Water','A bottle of water','Not mineral water, but smells ok.'))
+Adventure.locationAddThing('STREAM',Thing('APPLE','An Apple','A juicy looking Apple',"It is pulsating strangely. I'd better not eat it."))
+Adventure.locationAddThing('STREAM',Thing('RATIONS','Some Rations','A bag of Rations.',"The Rations look stale, but there all I've got till I reach an Inn or a Tavern"))
+Adventure.locationAddWay('STREAM',Way(['N','NORTH'],'North','North by a narrow track','A short walk later ...','HUT'))
+Adventure.locationAddWay('STREAM',Way(['W','WEST'],'West','West by a narrow track','A short walk later ...','PALMFOREST'))
 
 Adventure.addLocation(Location('HUT','Near the Hut','You are standing outside a little hut.'))
-Adventure.locationAddWay('HUT',Way('S','SOUTH','South','South by a narrow track','A short walk later ...','STREAM'))
-Adventure.locationAddWay('HUT',Way('IN','DOOR','Inside','The front door is ajar.','The door creaks erily as you enter ...','INHUT'))
-Adventure.locationAddWay('HUT',Way('W','WEST','West','West by a narrow track','A short walk later ...','VILLAGE'))
+Adventure.locationAddWay('HUT',Way(['S','SOUTH'],'South','South by a narrow track','A short walk later ...','STREAM'))
+Adventure.locationAddWay('HUT',Way(['IN','DOOR'],'Inside','The front door is ajar.','The door creaks erily as you enter ...','INHUT'))
+Adventure.locationAddWay('HUT',Way(['W','WEST'],'West','West by a narrow track','A short walk later ...','VILLAGE'))
 
 Adventure.addLocation(Location('INHUT','In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.'))
-Adventure.locationAddObject('INHUT',Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',0,2))
-Adventure.locationAddWay('INHUT',Way('OUT','DOOR','Out','Out front door','The door creaks as you leave','HUT'))
-Adventure.locationAddWay('INHUT',Way('UP','GO UP','Up','Up a ladder to the ceiling','You climb into the ceiling','ATTIC'))
-Adventure.locationAddWay('INHUT',Way('XYZZY','','Magic Word','Magic word unknown to adventurer','Wow! how did i get here?','STREAM',True))
+Adventure.locationAddThing('INHUT',Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',0,2))
+Adventure.locationAddWay('INHUT',Way(['OUT','DOOR'],'Out','Out front door','The door creaks as you leave','HUT'))
+Adventure.locationAddWay('INHUT',Way(['UP','GO UP'],'Up','Up a ladder to the ceiling','You climb into the ceiling','ATTIC'))
+Adventure.locationAddWay('INHUT',Way(['XYZZY'],'Magic Word','Magic word unknown to adventurer','Wow! how did i get here?','STREAM',True))
 
 Adventure.addLocation(Location('PALMFOREST','at the Palm Forest','You are standing in a lush, Palm Forest full of palms and ferns.'))
-Adventure.locationAddWay('PALMFOREST',Way('S','SOUTH','South','South by a narrow track','A short walk later ...','BEACH'))
-Adventure.locationAddWay('PALMFOREST',Way('W','WEST','West','West by a narrow track','A short walk later ...','DOCKS'))
-Adventure.locationAddWay('PALMFOREST',Way('E','EAST','East','East by a narrow track.',"A short walk later ...",'STREAM')) 
+Adventure.locationAddWay('PALMFOREST',Way(['S','SOUTH'],'South','South by a narrow track','A short walk later ...','BEACH'))
+Adventure.locationAddWay('PALMFOREST',Way(['W','WEST'],'West','West by a narrow track','A short walk later ...','DOCKS'))
+Adventure.locationAddWay('PALMFOREST',Way(['E','EAST'],'East','East by a narrow track.',"A short walk later ...",'STREAM')) 
 
 Adventure.addLocation(Location('BEACH','at the Beach','You are standing by the sea, with the water licking at your toes.'))
-Adventure.locationAddWay('BEACH',Way('N','NORTH','North','North by a narrow track','A short walk later ...','PALMFOREST'))
+Adventure.locationAddWay('BEACH',Way(['N','NORTH'],'North','North by a narrow track','A short walk later ...','PALMFOREST'))
 
 
 Adventure.addLocation(Location('ATTIC','In the Atttic','This is a dark hot place.'))
-Adventure.locationAddWay('ATTIC',Way('D','DOWN','Down','Down through the trapdoor','Going down','INHUT'))
+Adventure.locationAddWay('ATTIC',Way(['D','DOWN'],'Down','Down threw the trapdoor','Going down','INHUT'))
 
 Adventure.addLocation(Location('DOCKS','at the Docks','You are standing by the docks. There are a lot of ships, but one catches your eye and it seems to cost only 100 gold coins.'))
-Adventure.locationAddWay('DOCKS',Way('W','WEST','West','West by a narrow track','A short walk later ...','PALMFOREST'))
-Adventure.locationAddObject('DOCKS',Thing('Boat','A Small One-Man Craft.','The Fresh Cucumber',"          "))
+Adventure.locationAddWay('DOCKS',Way(['W','WEST'],'West','West by a narrow track','A short walk later ...','PALMFOREST'))
+Adventure.locationAddThing('DOCKS',Thing('Boat','A Small One-Man Craft.','The Fresh Cucumber',"          "))
 
 Adventure.addLocation(Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food.'))
-Adventure.locationAddWay('VILLAGE',Way('IN','IN TAVERN','In','In too the Tavern.',"You enter the Tavern with it's hot, stuffy air.",'TAVERN')) 
-Adventure.locationAddWay('VILLAGE',Way('E','EAST','East','East by a narrow track.',"A short walk later ...",'HUT')) 
-Adventure.locationAddWay('VILLAGE',Way('N','NORTH','North','North by a thin, narrow track.','A short walk later ...','FOREST')) 
+Adventure.locationAddWay('VILLAGE',Way(['IN','IN TAVERN'],'In','In too the Tavern.',"You enter the Tavern with it's hot, stuffy air.",'TAVERN')) 
+Adventure.locationAddWay('VILLAGE',Way(['E','EAST'],'East','East by a narrow track.',"A short walk later ...",'HUT')) 
+Adventure.locationAddWay('VILLAGE',Way(['N','NORTH'],'North','North by a thin, narrow track.','A short walk later ...','FOREST')) 
 
 Adventure.addLocation(Location('FOREST','At the Forest','You have arrived at a dark and spooky forest. There is a stench of something long dead, and no way back to the Village.'))
-Adventure.locationAddWay('FOREST',Way('N','NORTH','North','North by a thin, narrow track.',"A short walk later ...",'GRAVEYARD'))
+Adventure.locationAddWay('FOREST',Way(['N','NORTH'],'North','North by a thin, narrow track.',"A short walk later ...",'GRAVEYARD'))
 
 Adventure.addLocation(Location('GRAVEYARD','At the Graveyard','You have arrived at a dark, abandoned Graveyard. There is a stench of something long dead, and no way back to the Forest.'))
-Adventure.locationAddWay('GRAVEYARD',Way('PASS','VILLAGE','Secret Passage','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'VILLAGE'))
-Adventure.locationAddWay('GRAVEYARD',Way('PATH','CURSEDGLADE','Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'CURSEDGLADE'))
+Adventure.locationAddWay('GRAVEYARD',Way(['PASS','VILLAGE'],'Secret Passage','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'VILLAGE'))
+Adventure.locationAddWay('GRAVEYARD',Way(['PATH','CURSEDGLADE'],'Disguised path',''Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'CURSEDGLADE'))
 
 Adventure.addLocation(Location('CURSEDGLADE','At the Cursed Glade','You have arrived at a dark, Cursed Glade. There is a stench of something long dead.'))
-Adventure.locationAddWay('CURSEDGLADE',Way('PASS','GRAVEYARD','Hidden Tunnel','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'GRAVEYARD'))
-Adventure.locationAddObject('CURSEDGLADE',Thing('DIAMONDRING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',50))
+Adventure.locationAddWay('CURSEDGLADE',Way(['PASS','GRAVEYARD'],'Hidden Tunnel','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'GRAVEYARD'))
+Adventure.locationAddThing('CURSEDGLADE',Thing('DIAMONDRING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',50))
 
  
-Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'))
-Adventure.locationAddWay('TAVERN',Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE'))
-Adventure.locationAddObject('TAVERN',Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.'))
+#Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'))
+#Adventure.locationAddWay('TAVERN',Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE'))
+#Adventure.locationAddThing('TAVERN',Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.'))
+
+
+Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'
+                             ,[Way(['OUT','OUT TAVERN'],'Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE')]
+                             ,[Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.')]))
+
+
  
+ 
+
+#Adventure.listLocations()
+
+Adventure.location  = Adventure.getLocation('STREAM')
+
+Adventure.inventory = Inventory('INVENT','Inventory','This is a set of stuff held by a character'
+                               ,[Thing('NOTE','A Note','A interesting small note.','It reads,"XYZZY".')])
+
+
+
+debug ("BEGIN testing ways list iteration")
+wayCode = 'D'
+someways = [Way(['D','DOWN'],'Down','Down threw the trapdoor','Going down','INHUT'),Way(['OUT','DOOR'],'Out','Out front door','The door creaks as you leave','HUT')]
+for way in someways:
+   debug("Check way " + way.shortDesc) # + "[" + way.wayCodes + "]")
+   for w in way.wayCodes:
+      debug( "way:" + w )
+      
+   if wayCode in way.wayCodes:
+        debug( way.movingDesc)
+
+ 
+debug ("END testing ways list iteration")
+
+
+
+
+
+
+
+
+
 
  
 #storyline
@@ -364,11 +418,10 @@ print 'great power.'
 print 'You are a wanderer whose'
 print 'aim in life is too collect things.'
 print 'Your goal. Collect all'
-print 'objects in the region. There are ' + str( Thing.thingCount )
+print 'things in the region. There are ' + str( Thing.thingCount )
 print ' in total. FIND THOSE OBJECTS!'
 raw_input('Press enter to continue.')
 
-##Adventure.listLocations()
 mainCharacter = Character(name, 
                           Adventure.getLocation('STREAM'), 
                           Inventory('INVENT','Inventory','This is a set of stuff held by a character'))
@@ -376,7 +429,6 @@ mainCharacter = Character(name,
 mainCharacter.inventory.addObject(Thing('NOTE','A Note','An interesting small note.','It reads,"XYZZY".'))
 
 Adventure.mainCharacter = mainCharacter
-
 #perpetual loop
 while True:
  
