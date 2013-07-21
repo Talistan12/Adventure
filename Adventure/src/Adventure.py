@@ -1,4 +1,5 @@
 from Location import Location
+from Character import Character
 
 from Util import userException, debug
 
@@ -155,13 +156,11 @@ class Inventory:
       except userException,e:
          print "You don't have " + thingCode.lower() + "!"
 
- 
-
 class Landscape:
    'place to put the locations'
    locCount = 0
-   location = Location('','','')
-   inventory = Inventory('','','')
+   # characters = Character('','','')
+   mainCharacter = None
 
    def __init__(self, code, shortName, longName):
       self.code = code
@@ -249,31 +248,31 @@ class Landscape:
 
    def interpretCommand(self):
    # All commands are processed here.  Returns a Location
-         newLocation = self.location
+         newLocation = self.mainCharacter.location
          print     
-         command = raw_input ('What next?')
+         command = raw_input ('What next, ' + self.mainCharacter.name + '?')
          command = command.upper()
          try:
-             newLocation = self.goWay(self.location, command)
+             newLocation = self.goWay(self.mainCharacter.location, command)
          except userException,e:
             try:
-              self.location.getThing(self.inventory,command)
+              self.mainCharacter.location.getThing(self.mainCharacter.inventory,command)
             except userException,e:
                try:
-                   self.inventory.dropThing(self.location,command)
+                   self.mainCharacter.inventory.dropThing(self.mainCharacter.location,command)
                except userException,e:
                  try:
                     if ( command in ['L','LOOK']):
                        debug("recognised " + command)
-                       self.location.looks = 0
+                       self.mainCharacter.location.looks = 0
                     elif ( command in ['I','INVENT']):
                        debug("recognised " + command)
-                       self.inventory.displayThings()
+                       self.mainCharacter.inventory.displayThings()
                     elif ( command in ['S','SCORE']):
                        debug("recognised " + command)
-                       print "Your current score is " + str (self.inventory.score() )
+                       print "Your current score is " + str (self.mainCharacter.inventory.score() )
                     else:
-                       self.inventory.lookThing(command) #Look at an object in the inventory
+                       self.mainCharacter.inventory.lookThing(command) #Look at an object in the inventory
                  except userException,e:
                     print 'huh?'
          finally:
@@ -284,10 +283,10 @@ class Landscape:
    def doTurn(self):
 
       #Tell the adventurer where they are.
-      self.location.displayLocation()
+      self.mainCharacter.location.displayLocation()
 
       #Ask them what to do next
-      self.location = self.interpretCommand()
+      self.mainCharacter.location = self.interpretCommand()
  
 print
 
@@ -349,15 +348,6 @@ Adventure.locationAddWay('TAVERN',Way('OUT','OUT TAVERN','Out','Out of the Taver
 Adventure.locationAddObject('TAVERN',Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.'))
  
 
-##Adventure.listLocations()
-
-Adventure.location  = Adventure.getLocation('STREAM')
-
-Adventure.inventory = Inventory('INVENT','Inventory','This is a set of stuff held by a character')
-Adventure.inventory.addObject(Thing('NOTE','A Note','An interesting small note.','It reads,"XYZZY".'))
-
-
-
  
 #storyline
 print 'You have just woken up. Your'
@@ -377,6 +367,15 @@ print 'Your goal. Collect all'
 print 'objects in the region. There are ' + str( Thing.thingCount )
 print ' in total. FIND THOSE OBJECTS!'
 raw_input('Press enter to continue.')
+
+##Adventure.listLocations()
+mainCharacter = Character(name, 
+                          Adventure.getLocation('STREAM'), 
+                          Inventory('INVENT','Inventory','This is a set of stuff held by a character'))
+
+mainCharacter.inventory.addObject(Thing('NOTE','A Note','An interesting small note.','It reads,"XYZZY".'))
+
+Adventure.mainCharacter = mainCharacter
 
 #perpetual loop
 while True:
