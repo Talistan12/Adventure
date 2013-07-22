@@ -49,12 +49,8 @@ class Way:
         if self.looks < 2:
           print " " + self.longDesc
         else:
-         print " " + self.shortDesc
+          print " " + self.shortDesc
  
-
-
-
-
 class Inventory:
    'Common base class for all inventories'
    invCount = 0
@@ -160,24 +156,23 @@ class Inventory:
    
       except userException,e:
          print "You don't have " + thingCode.lower() + "!"
-
  
-
 class Landscape:
    'place to put the locations'
    locCount = 0
-   location = Location('','','')
+   #  location = Location('','','')
    # characters = Character('','','')
    mainCharacter = None
 
-   inventory = Inventory('','','')
+   #inventory = Inventory('','','')
 
    def __init__(self, code, shortName, longName):
       self.code = code
       self.shortName = shortName
       self.longName = longName
       self.looks = 0
-      self.LocCount = 0      self.locations = []
+      self.LocCount = 0      
+      self.locations = []
       debug ("Initialising the landscape")
 
    def locCount(self):
@@ -230,10 +225,10 @@ class Landscape:
       for way in fromLocation.ways:
           debug("Check way " + way.shortDesc)
           if wayCode in way.wayCodes:
-			      print
-			      print way.movingDesc
-			      debug(way.destLoc)
-			      return self.getLocation(way.destLoc)  
+               print
+               print way.movingDesc
+               debug(way.destLoc)
+               return self.getLocation(way.destLoc)  
  
       debug( 'Does it get here?')
       if ( wayCode in ['NORTH','SOUTH','EAST','WEST','N','S','E','W','NW','NE','SW','SE','UP','DOWN','IN','OUT','OVER','UNDER','THRU','AROUND']):
@@ -291,9 +286,7 @@ class Landscape:
                     print 'huh?'
          finally:
             return newLocation
-
-
-
+ 
    def doTurn(self):
 
       #Tell the adventurer where they are.
@@ -350,35 +343,21 @@ Adventure.locationAddWay('FOREST',Way(['N','NORTH'],'North','North by a thin, na
 
 Adventure.addLocation(Location('GRAVEYARD','At the Graveyard','You have arrived at a dark, abandoned Graveyard. There is a stench of something long dead, and no way back to the Forest.'))
 Adventure.locationAddWay('GRAVEYARD',Way(['PASS','VILLAGE'],'Secret Passage','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'VILLAGE'))
-Adventure.locationAddWay('GRAVEYARD',Way(['PATH','CURSEDGLADE'],'Disguised path',''Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'CURSEDGLADE'))
+Adventure.locationAddWay('GRAVEYARD',Way(['PATH','CURSEDGLADE'],'Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'CURSEDGLADE'))
 
 Adventure.addLocation(Location('CURSEDGLADE','At the Cursed Glade','You have arrived at a dark, Cursed Glade. There is a stench of something long dead.'))
 Adventure.locationAddWay('CURSEDGLADE',Way(['PASS','GRAVEYARD'],'Hidden Tunnel','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'GRAVEYARD'))
 Adventure.locationAddThing('CURSEDGLADE',Thing('DIAMONDRING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',50))
 
  
-#Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'))
-#Adventure.locationAddWay('TAVERN',Way('OUT','OUT TAVERN','Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE'))
-#Adventure.locationAddThing('TAVERN',Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.'))
-
-
 Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'
                              ,[Way(['OUT','OUT TAVERN'],'Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE')]
                              ,[Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.')]))
-
-
- 
- 
-
+  
 #Adventure.listLocations()
 
-Adventure.location  = Adventure.getLocation('STREAM')
-
-Adventure.inventory = Inventory('INVENT','Inventory','This is a set of stuff held by a character'
-                               ,[Thing('NOTE','A Note','A interesting small note.','It reads,"XYZZY".')])
-
-
-
+ 
+  
 debug ("BEGIN testing ways list iteration")
 wayCode = 'D'
 someways = [Way(['D','DOWN'],'Down','Down threw the trapdoor','Going down','INHUT'),Way(['OUT','DOOR'],'Out','Out front door','The door creaks as you leave','HUT')]
@@ -392,16 +371,7 @@ for way in someways:
 
  
 debug ("END testing ways list iteration")
-
-
-
-
-
-
-
-
-
-
+ 
  
 #storyline
 print 'You have just woken up. Your'
@@ -422,13 +392,13 @@ print 'things in the region. There are ' + str( Thing.thingCount )
 print ' in total. FIND THOSE OBJECTS!'
 raw_input('Press enter to continue.')
 
-mainCharacter = Character(name, 
-                          Adventure.getLocation('STREAM'), 
-                          Inventory('INVENT','Inventory','This is a set of stuff held by a character'))
-
-mainCharacter.inventory.addObject(Thing('NOTE','A Note','An interesting small note.','It reads,"XYZZY".'))
-
-Adventure.mainCharacter = mainCharacter
+Adventure.mainCharacter = Character(name
+                                   ,Adventure.getLocation('STREAM')
+                                   ,Inventory('INVENT'
+                                             ,'Inventory'
+                                             ,'This is a set of stuff held by a character'
+                                             ,[Thing('NOTE','A Note','A interesting small note.','It reads,"XYZZY".')]))
+ 
 #perpetual loop
 while True:
  
