@@ -3,7 +3,7 @@ from Inventory import Inventory
 from Character import Character
 from Thing import Thing
 from Util import userException, debug
- 
+
 
 class Landscape:
    'place to put the locations'
@@ -56,35 +56,6 @@ class Landscape:
       raise userException("Location Not Found")
 
 
-   def goWay(self, fromLocation, wayCommand):
-      #returns a Location unless an exception is raised.
-      if wayCommand == 'GO':
-         print 'Go where?'
-         print fromLocation.displayWays(0)
-         return fromLocation
-
-      elif wayCommand.split()[0] == 'GO':
-          wayCode = wayCommand.split().remove('GO')
-      else:
-         wayCode = wayCommand
-
-      debug( 'Searching for way.. ' + wayCode)
-      debug( 'way count ' + str (fromLocation.wayCount) )
-      for way in fromLocation.ways:
-          debug("Check way " + way.shortDesc)
-          if wayCode in way.wayCodes:
-               print
-               print way.movingDesc
-               debug(way.destLoc)
-               return self.getLocation(way.destLoc)
-
-      debug( 'Does it get here?')
-      if ( wayCode in ['NORTH','SOUTH','EAST','WEST','N','S','E','W','NW','NE','SW','SE','UP','DOWN','IN','OUT','OVER','UNDER','THRU','AROUND']):
-            print 'You cannot go ' + wayCode.lower()
-            return fromLocation
-
-      debug( 'Non-Directional')
-      raise userException("Non-Directional")
 
 
    def locationAddThing(self,locCode,thing):
@@ -102,7 +73,7 @@ class Landscape:
 
       except userException,e:
           print e.args
-          
+
 
    def locationAddCharacter(self,locCode,character):
       try:
@@ -111,59 +82,37 @@ class Landscape:
 
       except userException,e:
           print e.args
- 
 
-   def interpretCommand(self):
+
+   def interpretCommand(self,player):
    # All commands are processed here.  Returns a Location
          newLocation = self.mainCharacter.location
          print
-         command = raw_input ('What next, ' + self.mainCharacter.shortName + '?').replace('\r', '')
-         command = command.upper()
-         try:
-             newLocation = self.goWay(self.mainCharacter.location, command)
-         except userException,e:
-            try:
-              self.mainCharacter.location.getThing(self.mainCharacter.inventory,command)
-            except userException,e:
-               try:
-                   self.mainCharacter.inventory.dropThing(self.mainCharacter.location,command)
-               except userException,e:
-                   try:
-                      self.mainCharacter.location.lookCharacter(command)
-                   except userException,e:
-                       try:
-                           if ( command in ['L','LOOK']):
-                               debug("recognised " + command)
-                               self.mainCharacter.location.looks = 0
-                           elif ( command in ['I','INVENT']):
-                                   debug("recognised " + command)
-                                   self.mainCharacter.inventory.displayThings()
-                           elif ( command in ['S','SCORE']):
-                                   debug("recognised " + command)
-                                   print "Your current score is " + str (self.mainCharacter.inventory.score() )
-                           else:
-                                   self.mainCharacter.inventory.lookThing(command) #Look at an object in the inventory
-                       except userException,e:
-                            print 'huh?'
-         finally:
-            return newLocation
+         command = raw_input ('What next, ' + player.shortName + '?').replace('\r', '')
+         command = command.upper().strip()
+         if command <> '':
+             if player.location.interpretCommand(player,command):
+                debug('Location command')
+                
+             elif player.inventory.interpretCommand(player,command):
+                debug('Inventory command')
+             else:
+                print 'huh?'
+
 
    def doTurn(self):
-
-      #Tell the adventurer where they are.
-      self.mainCharacter.location.displayLocation()
-
+ 
       #Ask them what to do next
-      self.mainCharacter.location = self.interpretCommand()
+      self.interpretCommand(self.mainCharacter)
 
 print
 
 Adventure = Landscape("ADVENTURE","An Adventure","An amazing adventure")
 
 Adventure.addLocation(Location('STREAM','By a Stream','You are standing by a stream. The stream runs NE to SW.'))
-Adventure.locationAddThing('STREAM',Thing('WATER','Some Water','A bottle of water','Not mineral water, but smells ok.'))
-Adventure.locationAddThing('STREAM',Thing('APPLE','An Apple','A juicy looking Apple',"It is pulsating strangely. I'd better not eat it."))
-Adventure.locationAddThing('STREAM',Thing('RATIONS','Some Rations','A bag of Rations.',"The Rations look stale, but there all I've got till I reach an Inn or a Tavern"))
+Adventure.locationAddThing('STREAM',Thing('WATER','some Water','a bottle of water','Not mineral water, but smells ok.'))
+Adventure.locationAddThing('STREAM',Thing('APPLE','an Apple','a juicy looking Apple',"It is pulsating strangely. I'd better not eat it."))
+Adventure.locationAddThing('STREAM',Thing('RATIONS','some Rations','a bag of Rations.',"The Rations look stale, but there all I've got till I reach an Inn or a Tavern"))
 Adventure.locationAddWay('STREAM',Way(['N','NORTH'],'North','North by a narrow track','A short walk later ...','HUT'))
 Adventure.locationAddWay('STREAM',Way(['W','WEST'],'West','West by a narrow track','A short walk later ...','PALMFOREST'))
 
@@ -176,7 +125,6 @@ Adventure.addLocation(Location('INHUT','In the Hut','You are standing inside a d
 Adventure.locationAddThing('INHUT',Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',0,2))
 Adventure.locationAddWay('INHUT',Way(['OUT','DOOR'],'Out','Out front door','The door creaks as you leave','HUT'))
 Adventure.locationAddWay('INHUT',Way(['UP','U','MAGIC'],'Up','Up a ladder to the ceiling','You climb into the ceiling','ATTIC'))
-Adventure.locationAddWay('INHUT',Way(['XYZZY'],'Magic Word','Magic word unknown to adventurer','Wow! how did i get here?','STREAM',True))
 
 Adventure.addLocation(Location('PALMFOREST','at the Palm Forest','You are standing in a lush, Palm Forest full of palms and ferns.'))
 Adventure.locationAddWay('PALMFOREST',Way(['S','SOUTH'],'South','South by a narrow track','A short walk later ...','BEACH'))
@@ -218,6 +166,16 @@ Adventure.locationAddCharacter('GRAVEYARD',Character('ZOMBIE'
 Adventure.addLocation(Location('CURSEDGLADE','At the Cursed Glade','You have arrived at a dark, Cursed Glade. There is a stench of something long dead.'))
 Adventure.locationAddWay('CURSEDGLADE',Way(['PASS','GRAVEYARD'],'Hidden Tunnel','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'GRAVEYARD'))
 Adventure.locationAddThing('CURSEDGLADE',Thing('DIAMONDRING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',50))
+Adventure.locationAddWay('CURSEDGLADE',Way(['XYZZY'],'Magic Word','Magic word unknown to adventurer','Wow! how did i get here?','STREAM',True))
+Adventure.locationAddCharacter('CURSEDGLADE',Character('SKELETON'
+                                   ,'A Skeleton'
+                                   ,'A moist, glistening skeleton'
+                                   ,"A moist, glistening creature of the undead, who I can't recognise from any features."
+                                   ,Adventure.getLocation('CURSEDGLADE')
+                                   ,Inventory('INVENT'
+                                             ,'Inventory'
+                                             ,'This is a set of stuff held by a character'
+                                             ,[Thing('BONE','A Bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.')])))
 
 
 Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'
@@ -270,7 +228,10 @@ Adventure.mainCharacter = Character('ME'
                                    ,Inventory('INVENT'
                                              ,'Inventory'
                                              ,'This is a set of stuff held by a character'
-                                             ,[Thing('NOTE','A Note','A interesting small note.','It reads,"XYZZY".')]))
+                                             ,[Thing('NOTE','a Note','an interesting small note.','It reads,"XYZZY".')]))
+
+
+Adventure.mainCharacter.location.displayLocation()
 
 #perpetual loop
 while True:

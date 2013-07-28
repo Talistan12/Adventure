@@ -21,10 +21,10 @@ class Inventory:
    def displayCount(self):
      print "Total Locations %d" % Inventory.invCount
 
-   def displayThings(self):
+   def displayThings(self,player):
       if self.thingCount() > 0 :
          print
-         if self.code == 'ME':
+         if player.code == 'ME':
            print 'You are currently holding ..'
          else:
            print 'It has ..'  
@@ -32,7 +32,7 @@ class Inventory:
             thing.displayThing()
       else:
          print
-         if self.code == 'ME':
+         if player.code == 'ME':
            print 'You have nothing.'
 
 
@@ -60,23 +60,23 @@ class Inventory:
      debug( "Removed " + thing.code + " from " + self.code)
 
 
-   def dropThing(self, location, getCommand):
-
+   def dropThing(self, player, getCommand):
       if getCommand == 'DROP':
          if self.thingCount() == 1 :
            thingCode = 'ALL'
+
          elif self.thingCount() == 0:
            print 'You have nothing to drop.'
-           return
+           return True
          else:
            print 'Drop what?'
            self.displayThings()
-           return
+           return True
 
       elif getCommand.split()[0] == 'DROP':
          thingCode = getCommand.split()[1]
       else:
-         raise userException("Non-Drop")
+         return False
 
       debug( 'Searching for thing to drop.. ' + thingCode)
 
@@ -85,28 +85,63 @@ class Inventory:
               if thingCode in ['ALL',thing.code]:
                  print 'Dropped ' + thing.shortName + '!'
                  #add thing to location
-                 location.addThing(thing)
+                 player.location.addThing(thing)
                  #remove thing from inventory
-                 self.removeThing(thing)
+                 player.inventory.removeThing(thing)
                  DroppedIt = True
 
       try:
         if not DroppedIt:
-          Thing = location.findThing(thingCode)
+          Thing = player.location.findThing(thingCode)
           print 'I do not have ' +  Thing.shortName + ',but I can see it here.'
+          
       except userException,e:
          print "what? I can't drop " + thingCode.lower() + "!"
 
-   def lookThing(self, lookCommand):
+      return True   
+
+   def lookThing(self, player, lookCommand):
       debug( 'Searching for thing.. ' + lookCommand)
       if lookCommand.split()[0] == 'LOOK':
          thingCode = lookCommand.split()[1]
       else:
-         raise userException("Non-Look")
+         return False
 
       try:
         Thing = self.findThing(thingCode)
         print Thing.description
 
       except userException,e:
-         print "You don't have " + thingCode.lower() + "!"
+         try:
+            Thing = player.location.findThing(thingCode)
+            print 'I do not have ' +  Thing.shortName + ',but I can see it here.'
+            
+         except userException,e:
+            print "You don't have " + thingCode.lower() + "!"
+         
+      return True 
+         
+   def interpretCommand(self,player,command):
+   # All commands related to an Inventory
+   # Return True if the command was understood in this context.
+
+      if command in ['I','INVENT']:
+         debug('INVENTORY command')
+         self.displayThings(player)
+         return True
+      elif self.dropThing(player,command):
+         debug('Drop Command')
+         return True 
+      elif self.lookThing(player, command):
+         debug('Look Thing Command')
+         return True 
+      elif ( command in ['S','SCORE']):
+          debug('SCORE command')
+          print "Your current score is " + str (self.score() )
+          return True
+      else:
+        return False
+       
+         
+         
+         

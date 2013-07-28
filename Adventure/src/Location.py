@@ -131,56 +131,59 @@ class Location:
      debug( "Added " + character.shortName + " to " + self.code + " as it's character %d " % self.characterCount())
 
 
-
-   def goWay(self, wayCommand):
+   def goWay(self, player, wayCommand):
       #returns a Location unless an exception is raised.
-      if wayCommand == 'GO':
-         print 'Go where?'
-         print self.displayWays(0)
-         return self
+#      if wayCommand == 'GO':
+#         print 'Go where?'
+#         print self.displayWays(0)
+#         return self
 
-      elif wayCommand.split()[0] == 'GO':
+      if wayCommand.split()[0] == 'GO':
           wayCode = wayCommand.split().remove('GO')
       else:
          wayCode = wayCommand
 
-      debug( 'Searching for way..[' + wayCode + ']')
+      debug( 'Searching for way.. ' + wayCode)
       debug( 'way count ' + str ( self.wayCount() ) )
       debug( 'ways length ' + str( len(self.ways)) )
       #   debug( 'at least 1 way exists' )
       for way in self.ways:
           debug("Check way " + way.shortDesc)
           if wayCode in way.wayCodes:
-			      print
-			      print way.movingDesc
-			      debug(way.destLoc)
-			      return Adventure.getLocation(way.destLoc)
+                  print
+                  print way.movingDesc
+                  debug(way.destLoc)
+                  player.location = player.location #self.getLocation(way.destLoc)
+                  #Tell the adventurer where they are.
+                  player.location.displayLocation()
+                  return True
+                  #return newLocation
 
       debug( 'Does it get here?')
       if ( wayCode in ['NORTH','SOUTH','EAST','WEST','N','S','E','W','NW','NE','SW','SE','UP','DOWN','IN','OUT','OVER','UNDER','THRU','AROUND']):
             print 'You cannot go ' + wayCode.lower()
-            return self
+            return True
 
       debug( 'Non-Directional')
-      raise userException("Non-Directional")
+      return False
 
-   def getThing(self, inventory, getCommand):
+   def getThing(self, player, getCommand):
 
       if getCommand == 'GET':
          if self.thingCount() == 1 :
            thingCode = 'ALL'
          elif self.thingCount() == 0:
            print 'There is nothing to get.'
-           return
+           return True
          else:
            print 'Get what?'
            self.displayThings()
-           return
+           return True
 
       elif getCommand.split()[0] == 'GET':
          thingCode = getCommand.split()[1]
       else:
-         raise userException("Non-Get")
+         return False
 
       debug( 'Searching for thing to get.. ' + thingCode)
 
@@ -190,29 +193,62 @@ class Location:
           if thingCode in ['ALL',thing.code]:
                  print 'Got ' + thing.shortName + '!'
                  #add thing to inventory
-                 inventory.addThing(thing)
+                 player.inventory.addThing(thing)
                  #remove thing from location
-                 self.removeThing(thing)
+                 player.location.removeThing(thing)
                  GotIt = True
-
 
       try:
         if not GotIt:
-          Thing = inventory.findThing(thingCode)
+          Thing = player.inventory.findThing(thingCode)
           print 'Got ' +  Thing.shortName + ' already!'
+
       except userException,e:
          print "what? I can't pick " + thingCode.lower() + " up!"
+     
+      return True
 
    def lookCharacter(self, lookCommand):
       debug( 'Searching for character.. ' + lookCommand)
       if lookCommand.split()[0] == 'LOOK':
          characterCode = lookCommand.split()[1]
       else:
-         raise userException("Non-Look")
+         return False
 
       try:
         character = self.findCharacter(characterCode)
         print character.description
+        return True
 
       except userException,e:
-         print "There is no " + characterCode.lower() + " here!"
+         debug('Player is looking but if its a character its not here')
+         #Don't say its not here, because it could be a thing they are looking for
+         #So the lookThing routine will either find it or say its not here.
+         #print "There is no " + characterCode.lower() + " here!"
+         return False
+         
+   def interpretCommand(self,player,command):
+   # All commands related to a location, or stuff at locations (things, characters)
+   # Return True if the command was understood in this context.
+
+      if command in ['L','LOOK']:
+          debug('LOOK command')
+          player.location.looks = 0
+          player.location.displayLocation()
+          return True
+      elif ( command in ['GO']):
+          print "Go where?"
+          debug('GO command')
+          return True
+      if self.goWay(player, command):
+          debug('Go Command')
+          return True
+      elif self.getThing(player,command):
+          debug('Get Command')
+          return True
+      elif self.lookCharacter(command):
+          debug('Look Character Command')
+          return True
+      else:
+          return False
+         
