@@ -1,161 +1,9 @@
-from Location import Location
+from Location import Location, Way
+from Inventory import Inventory
 from Character import Character
-
+from Thing import Thing
 from Util import userException, debug
-
-
-class Thing:
-   'Common base class for all things'
-   thingCount = 0
-
-   def __init__(self, code, shortName, longName, description, valueGold = 0, damagePoints = 0):
-      self.code = code
-      self.shortName = shortName
-      self.longName = longName
-      self.description = description
-      self.valueGold = valueGold
-      self.valueDamage = damagePoints
-      self.looks = 0
-      debug( "New Thing %d " % Thing.thingCount + self.code )
-      Thing.thingCount += 1
-
-   def displayCount(self):
-     print "Total Things %d" % Thing.thingCount
-
-   def displayThing(self):
-      self.looks +=1
-      if self.looks < 2:
-        print " " + self.longName
-      else:
-        print " " + self.shortName
-
-
-class Way:
-   'Common base class for all ways between locations'
-   def __init__(self, wayCodes, shortDesc, longDesc, movingDesc ,destLoc, hidden = False):
-      self.wayCodes = wayCodes
-      self.shortDesc = shortDesc
-      self.longDesc = longDesc
-      self.movingDesc = movingDesc
-      self.destLoc = destLoc
-      self.hidden = hidden
-      self.looks = 0
-      debug( "New Way " + shortDesc + " to " + destLoc)
-
-   def displayWay(self,looks):
-      if not self.hidden:
-        #self.looks +=1
-        self.looks = looks #override with loc.looks so that a LOOK command also gives more way details.
-        if self.looks < 2:
-          print " " + self.longDesc
-        else:
-          print " " + self.shortDesc
-
-class Inventory:
-   'Common base class for all inventories'
-   invCount = 0
-
-   def __init__(self, code, shortName, longName, things = []):
-      self.code = code
-      self.shortName = shortName
-      self.longName = longName
-      self.looks = 0
-      if len(things) == 0:
-         self.things = []
-      else: self.things = things
-      debug( "New Inventory %d " % Inventory.invCount + self.code)
-      Inventory.invCount += 1
-
-   def thingCount(self):
-     return len(self.things)
-
-   def displayCount(self):
-     print "Total Locations %d" % Inventory.invCount
-
-   def displayThings(self):
-      if self.thingCount() > 0 :
-         print
-         print 'You are currently holding ..'
-         for thing in self.things:
-            thing.displayThing()
-      else:
-         print
-         print 'You have nothing.'
-
-   def findThing(self,thingCode):
-         for thing in self.things:
-            if thing.code == thingCode:
-               return thing
-         raise userException("No such thing")
-
-   def score(self):
-      myScore = 0
-      for thing in self.things:
-           myScore += thing.valueGold * 10
-
-      return myScore
-
-   def addThing(self, thing):
-
-     self.things.append(thing)
-     debug( "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount())
-
-   def removeThing(self, thing):
-
-     self.things.remove(thing)
-     debug( "Removed " + thing.code + " from " + self.code)
-
-
-   def dropThing(self, location, getCommand):
-
-      if getCommand == 'DROP':
-         if self.thingCount() == 1 :
-           thingCode = 'ALL'
-         elif self.thingCount() == 0:
-           print 'You have nothing to drop.'
-           return
-         else:
-           print 'Drop what?'
-           self.displayThings()
-           return
-
-      elif getCommand.split()[0] == 'DROP':
-         thingCode = getCommand.split()[1]
-      else:
-         raise userException("Non-Drop")
-
-      debug( 'Searching for thing to drop.. ' + thingCode)
-
-      DroppedIt = False
-      for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
-              if thingCode in ['ALL',thing.code]:
-                 print 'Dropped ' + thing.shortName + '!'
-                 #add thing to location
-                 location.addThing(thing)
-                 #remove thing from inventory
-                 self.removeThing(thing)
-                 DroppedIt = True
-
-      try:
-        if not DroppedIt:
-          Thing = location.findThing(thingCode)
-          print 'I do not have ' +  Thing.shortName + ',but I can see it here.'
-      except userException,e:
-         print "what? I can't drop " + thingCode.lower() + "!"
-
-   def lookThing(self, lookCommand):
-      debug( 'Searching for thing.. ' + lookCommand)
-      if lookCommand.split()[0] == 'LOOK':
-         thingCode = lookCommand.split()[1]
-      else:
-         raise userException("Non-Look")
-
-      try:
-        Thing = self.findThing(thingCode)
-        print Thing.description
-
-      except userException,e:
-         print "You don't have " + thingCode.lower() + "!"
+ 
 
 class Landscape:
    'place to put the locations'
@@ -254,12 +102,22 @@ class Landscape:
 
       except userException,e:
           print e.args
+          
+
+   def locationAddCharacter(self,locCode,character):
+      try:
+          Loc = self.getLocation(locCode)
+          Loc.addCharacter(character)
+
+      except userException,e:
+          print e.args
+ 
 
    def interpretCommand(self):
    # All commands are processed here.  Returns a Location
          newLocation = self.mainCharacter.location
          print
-         command = raw_input ('What next, ' + self.mainCharacter.name + '?').replace('\r', '')
+         command = raw_input ('What next, ' + self.mainCharacter.shortName + '?').replace('\r', '')
          command = command.upper()
          try:
              newLocation = self.goWay(self.mainCharacter.location, command)
@@ -270,20 +128,23 @@ class Landscape:
                try:
                    self.mainCharacter.inventory.dropThing(self.mainCharacter.location,command)
                except userException,e:
-                 try:
-                    if ( command in ['L','LOOK']):
-                       debug("recognised " + command)
-                       self.mainCharacter.location.looks = 0
-                    elif ( command in ['I','INVENT']):
-                       debug("recognised " + command)
-                       self.mainCharacter.inventory.displayThings()
-                    elif ( command in ['S','SCORE']):
-                       debug("recognised " + command)
-                       print "Your current score is " + str (self.mainCharacter.inventory.score() )
-                    else:
-                       self.mainCharacter.inventory.lookThing(command) #Look at an object in the inventory
-                 except userException,e:
-                    print 'huh?'
+                   try:
+                      self.mainCharacter.location.lookCharacter(command)
+                   except userException,e:
+                       try:
+                           if ( command in ['L','LOOK']):
+                               debug("recognised " + command)
+                               self.mainCharacter.location.looks = 0
+                           elif ( command in ['I','INVENT']):
+                                   debug("recognised " + command)
+                                   self.mainCharacter.inventory.displayThings()
+                           elif ( command in ['S','SCORE']):
+                                   debug("recognised " + command)
+                                   print "Your current score is " + str (self.mainCharacter.inventory.score() )
+                           else:
+                                   self.mainCharacter.inventory.lookThing(command) #Look at an object in the inventory
+                       except userException,e:
+                            print 'huh?'
          finally:
             return newLocation
 
@@ -341,9 +202,18 @@ Adventure.locationAddWay('VILLAGE',Way(['N','NORTH'],'North','North by a thin, n
 Adventure.addLocation(Location('FOREST','At the Forest','You have arrived at a dark and spooky forest. There is a stench of something long dead, and no way back to the Village.'))
 Adventure.locationAddWay('FOREST',Way(['N','NORTH'],'North','North by a thin, narrow track.',"A short walk later ...",'GRAVEYARD'))
 
-Adventure.addLocation(Location('GRAVEYARD','At the Grave yard','You have arrived at a dark, abandoned Grave yard. There is a stench of something long dead, and no way back to the Forest.'))
+Adventure.addLocation(Location('GRAVEYARD','At the Grave yard','You have arrived at a dark, abandoned Grave yard. There is a stench of something long dead, and no way back to the Forest.' ))
 Adventure.locationAddWay('GRAVEYARD',Way(['PASS','VILLAGE'],'Secret Passage','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'VILLAGE'))
 Adventure.locationAddWay('GRAVEYARD',Way(['PATH','CURSEDGLADE'],'Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'CURSEDGLADE'))
+Adventure.locationAddCharacter('GRAVEYARD',Character('ZOMBIE'
+                                   ,'A Zombie'
+                                   ,'A rotting Zombie'
+                                   ,'A rotting creature of the undead, who I believe used to be called "Bob"'
+                                   ,Adventure.getLocation('GRAVEYARD')
+                                   ,Inventory('INVENT'
+                                             ,'Inventory'
+                                             ,'This is a set of stuff held by a character'
+                                             ,[Thing('BRAIN','A Brain','A bloody Brain.','Looks like it has just been removed.')])))
 
 Adventure.addLocation(Location('CURSEDGLADE','At the Cursed Glade','You have arrived at a dark, Cursed Glade. There is a stench of something long dead.'))
 Adventure.locationAddWay('CURSEDGLADE',Way(['PASS','GRAVEYARD'],'Hidden Tunnel','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'GRAVEYARD'))
@@ -392,7 +262,10 @@ print 'things in the region. There are ' + str( Thing.thingCount )
 print ' in total. FIND THOSE OBJECTS!'
 raw_input('Press enter to continue.')
 
-Adventure.mainCharacter = Character(name
+Adventure.mainCharacter = Character('ME'
+                                   ,name
+                                   ,'the main character'
+                                   ,'this is the guy we care about'
                                    ,Adventure.getLocation('STREAM')
                                    ,Inventory('INVENT'
                                              ,'Inventory'
