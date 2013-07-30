@@ -2,15 +2,18 @@ from Util import userException, debug
 
 class Way:
    'Common base class for all ways between locations'
-   def __init__(self, wayCodes, shortDesc, longDesc, movingDesc ,destLoc, hidden = False):
+   def __init__(self, originLocation, destLocation, wayCodes, shortDesc, longDesc, movingDesc , hidden = False):
       self.wayCodes = wayCodes
       self.shortDesc = shortDesc
       self.longDesc = longDesc
       self.movingDesc = movingDesc
-      self.destLoc = destLoc
+      self.originLocation = originLocation
+      self.destLocation = destLocation
       self.hidden = hidden
       self.looks = 0
-      debug( "New Way " + shortDesc + " to " + destLoc)
+      debug( "New Way " + shortDesc + " to " + destLocation.shortName)
+      
+      originLocation.addWay(self)
 
    def displayWay(self,looks):
       if not self.hidden:
@@ -23,29 +26,31 @@ class Way:
 
 class Location:
    'Common base class for all locations'
-   locCount = 0
 
-   def __init__(self, code, shortName, longName, ways = [], things = [], characters = []):
-      self.code = code
+   locations = []
+ 
+   @staticmethod
+   def listLocations():
+         print 'Display all locations..'
+         for location in Location.locations:
+               location.displayLocation() 
+               
+   @staticmethod
+   def locationCount():
+       return len(Location.locations)
+ 
+   def __init__(self, shortName, longName ):
+      self.code = '' #DONT NEED THIS ANYMORE
       self.shortName = shortName
       self.longName = longName
       self.looks = 0
       self.ways = []
       self.things = []
       self.characters = []
-      #workaround for empty default set gotcha.
-      if len(ways) == 0:
-         self.ways = []
-      else: self.ways = ways
-      if len(things) == 0:
-         self.things = []
-      else: self.things = things
-      if len(characters) == 0:
-         self.characters = []
-      else: self.characters = characters
+      
+      Location.locations.append(self)
 
-      debug( "New Location %d " % Location.locCount + self.code)
-      Location.locCount += 1
+      debug( "New Location %d" % len(Location.locations) + self.shortName)
 
    def thingCount(self):
      return len(self.things)
@@ -103,8 +108,7 @@ class Location:
       self.displayWays(self.looks)
       self.displayThings()
       self.displayCharacters()
-
-
+ 
    def addThing(self, thing):
 
      self.things.append(thing)
@@ -115,6 +119,9 @@ class Location:
 
      self.things.remove(thing)
      debug( "Removed " + thing.code + " from " + self.code)
+     
+ 
+
 
 
    def addWay(self, way):
@@ -130,6 +137,11 @@ class Location:
      self.characters.append(character)
      debug( "Added " + character.shortName + " to " + self.code + " as it's character %d " % self.characterCount())
 
+   def removeCharacter(self, character):
+
+     self.characters.remove(character)
+     debug( "Removed " + character.shortName + " from " + self.code)
+  
 
    def goWay(self, player, wayCommand):
       #returns a Location unless an exception is raised.
@@ -139,7 +151,8 @@ class Location:
 #         return self
 
       if wayCommand.split()[0] == 'GO':
-          wayCode = wayCommand.split().remove('GO')
+          #wayCode = wayCommand.split().remove('GO')
+          wayCode = wayCommand.split(" ",1)[1]
       else:
          wayCode = wayCommand
 
@@ -152,8 +165,8 @@ class Location:
           if wayCode in way.wayCodes:
                   print
                   print way.movingDesc
-                  debug(way.destLoc)
-                  player.location = player.location #self.getLocation(way.destLoc)
+                  debug(way.destLocation.shortName)
+                  player.location = way.destLocation #self.getLocation(way.destLoc)
                   #Tell the adventurer where they are.
                   player.location.displayLocation()
                   return True
@@ -192,10 +205,7 @@ class Location:
       for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
           if thingCode in ['ALL',thing.code]:
                  print 'Got ' + thing.shortName + '!'
-                 #add thing to inventory
-                 player.inventory.addThing(thing)
-                 #remove thing from location
-                 player.location.removeThing(thing)
+                 thing.moveThing(player.location, player.inventory)
                  GotIt = True
 
       try:

@@ -4,15 +4,10 @@ class Inventory:
    'Common base class for all inventories'
    invCount = 0
 
-   def __init__(self, code, shortName, longName, things = []):
-      self.code = code
-      self.shortName = shortName
-      self.longName = longName
+   def __init__(self):
       self.looks = 0
-      if len(things) == 0:
-         self.things = []
-      else: self.things = things
-      debug( "New Inventory %d " % Inventory.invCount + self.code)
+      self.things = []
+      debug( "New Inventory %d " % Inventory.invCount)
       Inventory.invCount += 1
 
    def thingCount(self):
@@ -27,7 +22,7 @@ class Inventory:
          if player.code == 'ME':
            print 'You are currently holding ..'
          else:
-           print 'It has ..'  
+           print 'It has ..'
          for thing in self.things:
             thing.displayThing()
       else:
@@ -52,12 +47,12 @@ class Inventory:
    def addThing(self, thing):
 
      self.things.append(thing)
-     debug( "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount())
+     debug( "Added " + thing.code + " to inventory as it's thing %d " % self.thingCount())
 
    def removeThing(self, thing):
 
      self.things.remove(thing)
-     debug( "Removed " + thing.code + " from " + self.code)
+     debug( "Removed " + thing.code + " from inventory")
 
 
    def dropThing(self, player, getCommand):
@@ -84,21 +79,18 @@ class Inventory:
       for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
               if thingCode in ['ALL',thing.code]:
                  print 'Dropped ' + thing.shortName + '!'
-                 #add thing to location
-                 player.location.addThing(thing)
-                 #remove thing from inventory
-                 player.inventory.removeThing(thing)
+                 thing.moveThing(player.inventory, player.location)
                  DroppedIt = True
 
       try:
         if not DroppedIt:
           Thing = player.location.findThing(thingCode)
           print 'I do not have ' +  Thing.shortName + ',but I can see it here.'
-          
+
       except userException,e:
          print "what? I can't drop " + thingCode.lower() + "!"
 
-      return True   
+      return True
 
    def lookThing(self, player, lookCommand):
       debug( 'Searching for thing.. ' + lookCommand)
@@ -114,13 +106,13 @@ class Inventory:
       except userException,e:
          try:
             Thing = player.location.findThing(thingCode)
-            print 'I do not have ' +  Thing.shortName + ',but I can see it here.'
-            
+            print 'I do not have ' +  Thing.shortName + ', but I can see it here.'
+
          except userException,e:
             print "You don't have " + thingCode.lower() + "!"
-         
-      return True 
-         
+
+      return True
+
    def interpretCommand(self,player,command):
    # All commands related to an Inventory
    # Return True if the command was understood in this context.
@@ -131,17 +123,16 @@ class Inventory:
          return True
       elif self.dropThing(player,command):
          debug('Drop Command')
-         return True 
+         return True
       elif self.lookThing(player, command):
          debug('Look Thing Command')
-         return True 
+         return True
       elif ( command in ['S','SCORE']):
           debug('SCORE command')
           print "Your current score is " + str (self.score() )
           return True
       else:
         return False
-       
-         
-         
-         
+
+
+

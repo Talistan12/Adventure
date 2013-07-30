@@ -4,201 +4,88 @@ from Character import Character
 from Thing import Thing
 from Util import userException, debug
 
-
-class Landscape:
-   'place to put the locations'
-   locCount = 0
-   #  location = Location('','','')
-   # characters = Character('','','')
-   mainCharacter = None
-
-   #inventory = Inventory('','','')
-
-   def __init__(self, code, shortName, longName):
-      self.code = code
-      self.shortName = shortName
-      self.longName = longName
-      self.looks = 0
-      self.LocCount = 0
-      self.locations = []
-      debug ("Initialising the landscape")
-
-   def locCount(self):
-     return len(self.locations)
-
-
-   def listLocations(self):
-      if self.locCount() > 0 :
-         print 'Display all locations..'
-         for location in self.locations:
-               location.displayLocation()
-
-   def displayLandscape(self):
-      self.looks +=1
-      if self.looks < 2:
-        print self.longName
-      else:
-        print self.shortName
-      self.listLocations()
-
-   def addLocation(self, location):
-     self.locations.append(location)
-     debug( "Added " + location.code + " to " + self.code + " as it's location %d " % self.locCount())
-
-
-   def getLocation(self, locCode):
-      debug( 'Searching for location.. ' + locCode)
-      for location in self.locations:
-               if location.code == locCode:
-                     debug( 'Found ' + locCode)
-                     return location
-
-      raise userException("Location Not Found")
-
-
-
-
-   def locationAddThing(self,locCode,thing):
-      try:
-          Loc = self.getLocation(locCode)
-          Loc.addThing(thing)
-
-      except userException,e:
-          print e.args
-
-   def locationAddWay(self,locCode,way):
-      try:
-          Loc = self.getLocation(locCode)
-          Loc.addWay(way)
-
-      except userException,e:
-          print e.args
-
-
-   def locationAddCharacter(self,locCode,character):
-      try:
-          Loc = self.getLocation(locCode)
-          Loc.addCharacter(character)
-
-      except userException,e:
-          print e.args
-
-
-   def interpretCommand(self,player):
-   # All commands are processed here.  Returns a Location
-         newLocation = self.mainCharacter.location
-         print
-         command = raw_input ('What next, ' + player.shortName + '?').replace('\r', '')
-         command = command.upper().strip()
-         if command <> '':
-             if player.location.interpretCommand(player,command):
-                debug('Location command')
-                
-             elif player.inventory.interpretCommand(player,command):
-                debug('Inventory command')
-             else:
-                print 'huh?'
-
-
-   def doTurn(self):
- 
-      #Ask them what to do next
-      self.interpretCommand(self.mainCharacter)
-
 print
 
-Adventure = Landscape("ADVENTURE","An Adventure","An amazing adventure")
 
-Adventure.addLocation(Location('STREAM','By a Stream','You are standing by a stream. The stream runs NE to SW.'))
-Adventure.locationAddThing('STREAM',Thing('WATER','some Water','a bottle of water','Not mineral water, but smells ok.'))
-Adventure.locationAddThing('STREAM',Thing('APPLE','an Apple','a juicy looking Apple',"It is pulsating strangely. I'd better not eat it."))
-Adventure.locationAddThing('STREAM',Thing('RATIONS','some Rations','a bag of Rations.',"The Rations look stale, but there all I've got till I reach an Inn or a Tavern"))
-Adventure.locationAddWay('STREAM',Way(['N','NORTH'],'North','North by a narrow track','A short walk later ...','HUT'))
-Adventure.locationAddWay('STREAM',Way(['W','WEST'],'West','West by a narrow track','A short walk later ...','PALMFOREST'))
+STREAM = Location('By a Stream','You are standing by a stream. The stream runs NE to SW.')
+HUT = Location('Near the Hut','You are standing outside a little hut.')
+PALMFOREST = Location('At the Palm Forest','You are standing in a lush, Palm Forest full of palms and ferns.')
+INHUT = Location('In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.')
+BEACH = Location('At the Beach','You are standing by the sea, with the water licking at your toes.')
+ATTIC = Location('In the Attic','This is a dark hot place.')
+DOCKS = Location('At the Docks','You are standing by the docks. There are a lot of ships, but one catches your eye and it seems to cost only 100 gold coins.')
+FOREST = Location('At the Forest','You have arrived at a dark and spooky forest. There is a stench of something long dead, and no way back to the Village.')
+GRAVEYARD = Location('At the Grave yard','You have arrived at a dark, abandoned Grave yard. There is a stench of something long dead, and no way back to the Forest.' )
+VILLAGE = Location('At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in business. Maybe you could get some ale and food.')
+CURSEDGLADE = Location('At the Cursed Glade','You have arrived at a dark, Cursed Glade. There is a stench of something long dead.')
+TAVERN = Location('In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.')
 
-Adventure.addLocation(Location('HUT','Near the Hut','You are standing outside a little hut.'))
-Adventure.locationAddWay('HUT',Way(['S','SOUTH'],'South','South by a narrow track','A short walk later ...','STREAM'))
-Adventure.locationAddWay('HUT',Way(['IN','DOOR'],'Inside','The front door is ajar.','The door creaks eerily as you enter ...','INHUT'))
-Adventure.locationAddWay('HUT',Way(['W','WEST'],'West','West by a narrow track','A short walk later ...','VILLAGE'))
+#STREAM
+Way(STREAM, HUT       ,['N','NORTH'],'North','North by a narrow track','A short walk later ...')
+Way(STREAM, PALMFOREST,['W','WEST'] ,'West','West by a narrow track','A short walk later ...')
 
-Adventure.addLocation(Location('INHUT','In the Hut','You are standing inside a dark smelly little hut with a trap-door in the floor and a ladder to the attic.'))
-Adventure.locationAddThing('INHUT',Thing('KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',0,2))
-Adventure.locationAddWay('INHUT',Way(['OUT','DOOR'],'Out','Out front door','The door creaks as you leave','HUT'))
-Adventure.locationAddWay('INHUT',Way(['UP','U','MAGIC'],'Up','Up a ladder to the ceiling','You climb into the ceiling','ATTIC'))
+WATER   = Thing(STREAM, 'WATER','some Water','a bottle of water','Not mineral water, but smells ok.')
+APPLE   = Thing(STREAM, 'APPLE','an Apple','a juicy looking Apple',"It is pulsating strangely. I'd better not eat it.")
+RATIONS = Thing(STREAM, 'RATIONS','some Rations','a bag of Rations.',"The Rations look stale, but there all I've got till I reach an Inn or a Tavern")
 
-Adventure.addLocation(Location('PALMFOREST','at the Palm Forest','You are standing in a lush, Palm Forest full of palms and ferns.'))
-Adventure.locationAddWay('PALMFOREST',Way(['S','SOUTH'],'South','South by a narrow track','A short walk later ...','BEACH'))
-Adventure.locationAddWay('PALMFOREST',Way(['W','WEST'],'West','West by a narrow track','A short walk later ...','DOCKS'))
-Adventure.locationAddWay('PALMFOREST',Way(['E','EAST'],'East','East by a narrow track.',"A short walk later ...",'STREAM'))
+#HUT
+Way(HUT, STREAM ,['S','SOUTH'],'South','South by a narrow track','A short walk later ...')
+Way(HUT, INHUT  ,['IN','DOOR'],'Inside','The front door is ajar.','The door creaks eerily as you enter ...')
+Way(HUT, VILLAGE,['W','WEST'] ,'West','West by a narrow track','A short walk later ...')
 
-Adventure.addLocation(Location('BEACH','at the Beach','You are standing by the sea, with the water licking at your toes.'))
-Adventure.locationAddWay('BEACH',Way(['N','NORTH'],'North','North by a narrow track','A short walk later ...','PALMFOREST'))
+#PALMFOREST
+Way(PALMFOREST,STREAM,['E','EAST'],'East','East by a narrow track.',"A short walk later ...")
+Way(PALMFOREST,BEACH ,['S','SOUTH'],'South','South by a narrow track','A short walk later ...')
+Way(PALMFOREST,DOCKS ,['W','WEST'],'West','West by a narrow track','A short walk later ...')
 
+#INHUT
+Way(INHUT,HUT  ,['OUT','DOOR'],'Out','Out front door','The door creaks as you leave')
+Way(INHUT,ATTIC,['UP','U','MAGIC'],'Up','Up a ladder to the ceiling','You climb into the ceiling')
 
-Adventure.addLocation(Location('ATTIC','In the Attic','This is a dark hot place.'))
-Adventure.locationAddWay('ATTIC',Way(['D','DOWN'],'Down','Down threw the trap door','Going down','INHUT'))
+KNIFE = Thing(INHUT,'KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',0,2)
 
-Adventure.addLocation(Location('DOCKS','at the Docks','You are standing by the docks. There are a lot of ships, but one catches your eye and it seems to cost only 100 gold coins.'))
-Adventure.locationAddWay('DOCKS',Way(['W','WEST'],'West','West by a narrow track','A short walk later ...','PALMFOREST'))
-Adventure.locationAddThing('DOCKS',Thing('Boat','A Small One-Man Craft.','The Fresh Cucumber',"          "))
+#BEACH
+Way(BEACH,PALMFOREST,['N','NORTH'],'North','North by a narrow track','A short walk later ...')
 
-Adventure.addLocation(Location('VILLAGE','At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in buisness. Maybe you could get some ale and food.'))
-Adventure.locationAddWay('VILLAGE',Way(['IN','IN TAVERN'],'In','In too the Tavern.',"You enter the Tavern with it's hot, stuffy air.",'TAVERN'))
-Adventure.locationAddWay('VILLAGE',Way(['E','EAST'],'East','East by a narrow track.',"A short walk later ...",'HUT'))
-Adventure.locationAddWay('VILLAGE',Way(['N','NORTH'],'North','North by a thin, narrow track.','A short walk later ...','FOREST'))
+#ATTIC
+Way(ATTIC,INHUT,['D','DOWN'],'Down','Down through the trap door','Going down')
 
-Adventure.addLocation(Location('FOREST','At the Forest','You have arrived at a dark and spooky forest. There is a stench of something long dead, and no way back to the Village.'))
-Adventure.locationAddWay('FOREST',Way(['N','NORTH'],'North','North by a thin, narrow track.',"A short walk later ...",'GRAVEYARD'))
+#DOCKS
+Way(DOCKS,PALMFOREST,['W','WEST'],'West','West by a narrow track','A short walk later ...')
 
-Adventure.addLocation(Location('GRAVEYARD','At the Grave yard','You have arrived at a dark, abandoned Grave yard. There is a stench of something long dead, and no way back to the Forest.' ))
-Adventure.locationAddWay('GRAVEYARD',Way(['PASS','VILLAGE'],'Secret Passage','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'VILLAGE'))
-Adventure.locationAddWay('GRAVEYARD',Way(['PATH','CURSEDGLADE'],'Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'CURSEDGLADE'))
-Adventure.locationAddCharacter('GRAVEYARD',Character('ZOMBIE'
-                                   ,'A Zombie'
-                                   ,'A rotting Zombie'
-                                   ,'A rotting creature of the undead, who I believe used to be called "Bob"'
-                                   ,Adventure.getLocation('GRAVEYARD')
-                                   ,Inventory('INVENT'
-                                             ,'Inventory'
-                                             ,'This is a set of stuff held by a character'
-                                             ,[Thing('BRAIN','A Brain','A bloody Brain.','Looks like it has just been removed.')])))
+BOAT = Thing(DOCKS,'Boat','A Small One-Man Craft.','The Fresh Cucumber',"          ")
 
-Adventure.addLocation(Location('CURSEDGLADE','At the Cursed Glade','You have arrived at a dark, Cursed Glade. There is a stench of something long dead.'))
-Adventure.locationAddWay('CURSEDGLADE',Way(['PASS','GRAVEYARD'],'Hidden Tunnel','Underground by a dark, thin, narrow passage.',"A long crawl later ...",'GRAVEYARD'))
-Adventure.locationAddThing('CURSEDGLADE',Thing('DIAMONDRING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',50))
-Adventure.locationAddWay('CURSEDGLADE',Way(['XYZZY'],'Magic Word','Magic word unknown to adventurer','Wow! how did i get here?','STREAM',True))
-Adventure.locationAddCharacter('CURSEDGLADE',Character('SKELETON'
-                                   ,'A Skeleton'
-                                   ,'A moist, glistening skeleton'
-                                   ,"A moist, glistening creature of the undead, who I can't recognise from any features."
-                                   ,Adventure.getLocation('CURSEDGLADE')
-                                   ,Inventory('INVENT'
-                                             ,'Inventory'
-                                             ,'This is a set of stuff held by a character'
-                                             ,[Thing('BONE','A Bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.')])))
+#FOREST
+Way(FOREST,GRAVEYARD,['N','NORTH'],'North','North by a thin, narrow track.',"A short walk later ...")
+
+#GRAVEYARD
+Way(GRAVEYARD,VILLAGE,['PASS','VILLAGE'],'Secret Passage','Underground by a dark, thin, narrow passage.',"A long crawl later ...")
+Way(GRAVEYARD,CURSEDGLADE,['PATH','CURSEDGLADE'],'Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'')
+
+ZOMBIE = Character(GRAVEYARD, 'ZOMBIE' ,'A Zombie' ,'A rotting Zombie' ,'A rotting creature of the undead, who I believe used to be called "Bob"')
+Thing(ZOMBIE.inventory,'BRAIN','A Brain','A bloody Brain.','Looks like it has just been removed.')
+
+#VILLAGE
+Way(VILLAGE,TAVERN,['IN','IN TAVERN'],'In','In too the Tavern.',"You enter the Tavern with it's hot, stuffy air.")
+Way(VILLAGE,HUT   ,['E','EAST']      ,'East','East by a narrow track.',"A short walk later ...")
+Way(VILLAGE,FOREST,['N','NORTH']     ,'North','North by a thin, narrow track.','A short walk later ...')
+
+#CURSEDGLADE
+Way(CURSEDGLADE,GRAVEYARD,['PASS','GRAVEYARD'],'Hidden Tunnel','Underground by a dark, thin, narrow passage.',"A long crawl later ...")
+Way(CURSEDGLADE,STREAM,['XYZZY'],'Magic Word','Magic word unknown to adventurer','Wow! how did i get here?',True)
 
 
-Adventure.addLocation(Location('TAVERN','In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.'
-                             ,[Way(['OUT','OUT TAVERN'],'Out','Out of the Tavern.','You leave the Tavern for the fresh air.','VILLAGE')]
-                             ,[Thing('ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.')]))
+DIAMOND_RING = Thing(CURSEDGLADE,'DIAMOND RING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',50)
 
-#Adventure.listLocations()
-
+SKELETON = Character(CURSEDGLADE,'SKELETON','A Skeleton' ,'A moist, glistening skeleton' ,"A moist, glistening creature of the undead, who I can't recognise from any features.")
+Thing(SKELETON.inventory,'BONE','A Bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.')
 
 
-debug ("BEGIN testing ways list iteration")
-wayCode = 'D'
-someways = [Way(['D','DOWN'],'Down','Down threw the trapdoor','Going down','INHUT'),Way(['OUT','DOOR'],'Out','Out front door','The door creaks as you leave','HUT')]
-for way in someways:
-   debug("Check way " + way.shortDesc) # + "[" + way.wayCodes + "]")
-   for w in way.wayCodes:
-      debug( "way:" + w )
+#TAVERN
+Way(TAVERN,VILLAGE,['OUT','OUT TAVERN'],'Out','Out of the Tavern.','You leave the Tavern for the fresh air.')
 
-   if wayCode in way.wayCodes:
-        debug( way.movingDesc)
+ALE = Thing(TAVERN,'ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.')
 
-
-debug ("END testing ways list iteration")
 
 
 #storyline
@@ -218,25 +105,37 @@ print 'aim in life is too collect things.'
 print 'Your goal. Collect all'
 print 'things in the region. There are ' + str( Thing.thingCount )
 print ' in total. FIND THOSE OBJECTS!'
-raw_input('Press enter to continue.')
+#raw_input('Press enter to continue.')
+print
+print
 
-Adventure.mainCharacter = Character('ME'
-                                   ,name
-                                   ,'the main character'
-                                   ,'this is the guy we care about'
-                                   ,Adventure.getLocation('STREAM')
-                                   ,Inventory('INVENT'
-                                             ,'Inventory'
-                                             ,'This is a set of stuff held by a character'
-                                             ,[Thing('NOTE','a Note','an interesting small note.','It reads,"XYZZY".')]))
+PLAYER = Character( STREAM
+                   ,'ME'
+                   , name
+                   ,'the main character'
+                   ,'this is the guy we care about' )
+
+Thing(PLAYER.inventory,'NOTE','a Note','an interesting small note.','It reads,"XYZZY".')
+
+#KEEP example of how to get lists of all objects
+#print
+#print "Total Locations = %d " % Location.locationCount()
+#Location.listLocations()
+#print
+#print "Total Things = %d " % Thing.thingCount()
+#Thing.listThings()
+#print
+#print "Total Characters = %d " % Character.characterCount()
+#Character.listCharacters()
+
+PLAYER.location.displayLocation()
 
 
-Adventure.mainCharacter.location.displayLocation()
 
 #perpetual loop
 while True:
 
-  Adventure.doTurn()
+    PLAYER.doTurn()
 
 
 
