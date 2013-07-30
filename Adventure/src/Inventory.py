@@ -21,10 +21,19 @@ class Inventory:
          print
          if player.code == 'ME':
            print 'You are currently holding ..'
+           for thing in self.things:
+              thing.displayThing()
          else:
-           print 'It has ..'
-         for thing in self.things:
-            thing.displayThing()
+           visibleThings = False
+           for thing in self.things:
+              if not thing.hidden:
+                  visibleThings = True
+           if visibleThings:
+               print 'It has ..'
+               for thing in self.things:
+                  if not thing.hidden:
+                     thing.displayThing()
+
       else:
          print
          if player.code == 'ME':

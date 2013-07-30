@@ -151,7 +151,6 @@ class Location:
 #         return self
 
       if wayCommand.split()[0] == 'GO':
-          #wayCode = wayCommand.split().remove('GO')
           wayCode = wayCommand.split(" ",1)[1]
       else:
          wayCode = wayCommand
@@ -221,7 +220,7 @@ class Location:
    def lookCharacter(self, lookCommand):
       debug( 'Searching for character.. ' + lookCommand)
       if lookCommand.split()[0] == 'LOOK':
-         characterCode = lookCommand.split()[1]
+         characterCode = lookCommand.split(" ",1)[1]
       else:
          return False
 
@@ -236,6 +235,35 @@ class Location:
          #So the lookThing routine will either find it or say its not here.
          #print "There is no " + characterCode.lower() + " here!"
          return False
+ 
+#   def fightCharacter(self, player, fightCommand):
+#      debug( 'Searching for character.. ' + fightCommand)
+#      if lookCommand.split()[0] == 'FIGHT':
+#         characterCode = lookCommand.split()[1]
+#      else:
+#         return False
+#
+#      try:
+#        character = self.findCharacter(characterCode)
+#        debug("Found character " + character.shortName)
+#        if lookCommand.split()[2] == 'WITH':
+#          weaponCode = lookCommand.split()[3]
+#          player.inventory
+#        else:
+#          print "With what?"
+#          return True
+#        
+#        
+#        
+#        
+#        print character.description
+#        return True
+#
+#      except userException,e:
+#         debug('Player is looking but if its a character its not here')
+#         print "There is no " + characterCode.lower + " here to fight."
+#         return True
+#     
          
    def interpretCommand(self,player,command):
    # All commands related to a location, or stuff at locations (things, characters)
@@ -259,6 +287,9 @@ class Location:
       elif self.lookCharacter(command):
           debug('Look Character Command')
           return True
+#      elif self.fightCharacter(player,command):
+#          debug('Fight Character Command')
+#          return True
       else:
           return False
          

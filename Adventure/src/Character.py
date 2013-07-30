@@ -43,6 +43,49 @@ class Character:
        originLocation.removeCharacter(self)   
        destLocation.addCharacter(self)
        self.location = destLocation
+       
+       
+    def fightCharacter(self, fightCommand):
+      fightingWords = ['FIGHT','ATTACK','KILL'] 
+      fightWord = fightCommand.split()[0]
+      debug( 'Searching for character.. ' + fightCommand)
+      if (fightCommand in fightingWords):
+          print fightWord.capitalize() + " what?"
+          return True
+      if (fightWord in fightingWords):
+         characterCode = fightCommand.split()[1]
+      else:
+         return False
+
+      try:
+        character = self.location.findCharacter(characterCode)
+        debug("Found character " + character.shortName)
+        
+      except userException,e:
+         debug('Player is looking but if its a character its not here')
+         print "There is no " + characterCode.capitalize() + " here to fight."
+         return True
+        
+      if len(fightCommand.split()) < 4:
+          print fightWord.capitalize() + " " + characterCode.capitalize() + " WITH something?"
+          return True
+        
+      if fightCommand.split()[2] == 'WITH':
+          weaponCode = fightCommand.split()[3]
+          try:
+              weapon = self.inventory.findThing(weaponCode)
+              print "You swing at " + character.shortName + " with " + weapon.shortName
+              print "You missed!"
+              return True
+          except userException,e:
+              debug('Player is not holding weapon')
+              print "You don't have " + weaponCode.capitalize()
+              return True
+  
+      else:
+          print fightWord.capitalize() + " " + characterCode.capitalize() + " WITH something?"
+          return True
+ 
 
     def interpretCommand(self):
     # All commands are processed here.  Returns a Location
@@ -56,6 +99,9 @@ class Character:
 
              elif self.inventory.interpretCommand(self,command):
                 debug('Inventory command')
+                
+             elif self.fightCharacter(command):
+                debug('Fight Character Command')
              else:
                 print 'huh?'
 

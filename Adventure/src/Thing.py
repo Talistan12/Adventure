@@ -22,6 +22,7 @@ class Thing:
       self.valueGold = valueGold
       self.valueDamage = damagePoints
       self.looks = 0
+      self.hidden = False
  
       Thing.things.append(self)
       
