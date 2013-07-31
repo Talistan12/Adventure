@@ -3,6 +3,7 @@ from Inventory import Inventory
 from Character import Character
 from Thing import Thing
 from Util import userException, debug
+import random
 
 print
 
@@ -19,12 +20,13 @@ GRAVEYARD = Location('At the Grave yard','You have arrived at a dark, abandoned 
 VILLAGE = Location('At the Village','You have arrived at a village bustling with life. There is a tavern which seems to be booming in business. Maybe you could get some ale and food.')
 CURSEDGLADE = Location('At the Cursed Glade','You have arrived at a dark, Cursed Glade. There is a stench of something long dead.')
 TAVERN = Location('In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.')
+SEA = Location('On the Sea','You are standing on a boat, crossing the briny blue.')
 
 #STREAM
 Way(STREAM, HUT       ,['N','NORTH'],'North','North by a narrow track','A short walk later ...')
 Way(STREAM, PALMFOREST,['W','WEST'] ,'West','West by a narrow track','A short walk later ...')
 
-WATER   = Thing(STREAM, 'WATER','some Water','a bottle of water','Not mineral water, but smells ok.')
+WATER   = Thing(STREAM, 'WATER','some Water','a bottle of water','Not mineral water, but smells okay.')
 APPLE   = Thing(STREAM, 'APPLE','an Apple','a juicy looking Apple',"It is pulsating strangely. I'd better not eat it.")
 RATIONS = Thing(STREAM, 'RATIONS','some Rations','a bag of Rations.',"The Rations look stale, but there all I've got till I reach an Inn or a Tavern")
 
@@ -53,7 +55,7 @@ Way(ATTIC,INHUT,['D','DOWN'],'Down','Down through the trap door','Going down')
 #DOCKS
 Way(DOCKS,PALMFOREST,['W','WEST'],'West','West by a narrow track','A short walk later ...')
 
-BOAT = Thing(DOCKS,'Boat','A Small One-Man Craft.','The Fresh Cucumber',"          ")
+BOAT = Thing(DOCKS,'Boat','A Small One-Man Craft.','The Fresh Cucumber',"          ",100)
 
 #FOREST
 Way(FOREST,GRAVEYARD,['N','NORTH'],'North','North by a thin, narrow track.',"A short walk later ...")
@@ -62,7 +64,7 @@ Way(FOREST,GRAVEYARD,['N','NORTH'],'North','North by a thin, narrow track.',"A s
 Way(GRAVEYARD,VILLAGE,['PASS','VILLAGE'],'Secret Passage','Underground by a dark, thin, narrow passage.',"A long crawl later ...")
 Way(GRAVEYARD,CURSEDGLADE,['PATH','CURSEDGLADE'],'Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'')
 
-ZOMBIE = Character(GRAVEYARD, 'ZOMBIE' ,'A Zombie' ,'A rotting Zombie' ,'A rotting creature of the undead, who I believe used to be called "Bob"')
+ZOMBIE = Character(GRAVEYARD, 'ZOMBIE' ,'A Zombie' ,'A rotting Zombie' ,'A rotting creature of the undead, who I believe used to be called "Bob"',random.randrange(1,13))
 BRAIN = Thing(ZOMBIE.inventory,'BRAIN','A Brain','A bloody Brain.','Looks like it has just been removed.')
 
 #VILLAGE
@@ -75,9 +77,9 @@ Way(CURSEDGLADE,GRAVEYARD,['PASS','GRAVEYARD'],'Hidden Tunnel','Underground by a
 Way(CURSEDGLADE,STREAM,['XYZZY'],'Magic Word','Magic word unknown to adventurer','Wow! how did i get here?',True)
 
 
-DIAMOND_RING = Thing(CURSEDGLADE,'DIAMOND RING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',50)
+DIAMOND_RING = Thing(CURSEDGLADE,'DIAMOND RING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',500)
 
-SKELETON = Character(CURSEDGLADE,'SKELETON','A Skeleton' ,'A moist, glistening skeleton' ,"A moist, glistening creature of the undead, who I can't recognise from any features.")
+SKELETON = Character(STREAM,'SKELETON','A Skeleton' ,'A moist, glistening skeleton' ,"A moist, glistening creature of the undead, who I can't recognise from any features.",random.randrange(2,12))
 BONE = Thing(SKELETON.inventory,'BONE','A Bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.')
 BONE.hidden = True
 
@@ -114,7 +116,9 @@ PLAYER = Character( STREAM
                    ,'ME'
                    , name
                    ,'the main character'
-                   ,'this is the guy we care about' )
+                   ,'this is the guy we care about' 
+                   ,random.randrange(6,10)
+                   ,40)
 
 Thing(PLAYER.inventory,'NOTE','a Note','an interesting small note.','It reads,"XYZZY".')
 
