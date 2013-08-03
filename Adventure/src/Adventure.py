@@ -112,6 +112,7 @@ print ' in total. FIND THOSE OBJECTS!'
 print
 print
 
+
 PLAYER = Character( STREAM
                    ,'ME'
                    , name
@@ -133,10 +134,8 @@ Thing(PLAYER.inventory,'NOTE','a Note','an interesting small note.','It reads,"X
 #print "Total Characters = %d " % Character.characterCount()
 #Character.listCharacters()
 
-PLAYER.location.displayLocation()
-
-
-
+PLAYER.location.displayLocation(PLAYER)
+ 
 #perpetual loop
 while True:
 

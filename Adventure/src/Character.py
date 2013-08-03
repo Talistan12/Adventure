@@ -82,6 +82,7 @@ class Character:
                   print "You got a direct hit!"
                   character.hitPoints = character.hitPoints - (self.damagePoints + weapon.damagePoints)
                   if character.hitPoints <= 0:
+                      self.location.removeCharacter(character)
                       print "you have killed your foe!"
 
                   return True

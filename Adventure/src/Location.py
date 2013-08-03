@@ -78,12 +78,13 @@ class Location:
          for thing in self.things:
             thing.displayThing()
 
-   def displayCharacters(self):
-      if self.characterCount() > 0 :
+   def displayCharacters(self,player):
+      if self.characterCount() > 1 :
          print
          print 'I can see ..'
          for character in self.characters:
-            character.displayCharacter()
+             if character <> player:
+                character.displayCharacter()
 
    def findThing(self,thingCode):
       for thing in self.things:
@@ -98,7 +99,9 @@ class Location:
       raise userException("No such character")
 
 
-   def displayLocation(self):
+   def displayLocation(self,player):
+      print
+      print '-------------------------------------------------------------------------------------------------------------------------------------'
       print
       self.looks +=1
       if self.looks < 2:
@@ -107,7 +110,7 @@ class Location:
         print self.shortName
       self.displayWays(self.looks)
       self.displayThings()
-      self.displayCharacters()
+      self.displayCharacters(player)
  
    def addThing(self, thing):
 
@@ -165,9 +168,9 @@ class Location:
                   print
                   print way.movingDesc
                   debug(way.destLocation.shortName)
-                  player.location = way.destLocation #self.getLocation(way.destLoc)
+                  player.moveCharacter(player.location, way.destLocation)
                   #Tell the adventurer where they are.
-                  player.location.displayLocation()
+                  player.location.displayLocation(player)
                   return True
                   #return newLocation
 
@@ -272,7 +275,7 @@ class Location:
       if command in ['L','LOOK']:
           debug('LOOK command')
           player.location.looks = 0
-          player.location.displayLocation()
+          player.location.displayLocation(player)
           return True
       elif ( command in ['GO']):
           print "Go where?"
