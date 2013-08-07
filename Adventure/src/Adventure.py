@@ -21,6 +21,8 @@ VILLAGE = Location('At the Village','You have arrived at a village bustling with
 CURSEDGLADE = Location('At the Cursed Glade','You have arrived at a dark, Cursed Glade. There is a stench of something long dead.')
 TAVERN = Location('In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.')
 SEA = Location('On the Sea','You are standing on a boat, crossing the briny blue.')
+HIDDENROOM = Location('In the Hidden Room','You are standing in a room, full of secrets and treasure.')
+
 
 #STREAM
 Way(STREAM, HUT       ,['N','NORTH'],'North','North by a narrow track','A short walk later ...')
@@ -43,8 +45,19 @@ Way(PALMFOREST,DOCKS ,['W','WEST'],'West','West by a narrow track','A short walk
 #INHUT
 Way(INHUT,HUT  ,['OUT','DOOR'],'Out','Out front door','The door creaks as you leave')
 Way(INHUT,ATTIC,['UP','U','MAGIC'],'Up','Up a ladder to the ceiling','You climb into the ceiling')
+Way(INHUT,HIDDENROOM,['XYZZY'],'Strange Mist','A Strange Mist is located here.','You enter the mist.')
 
 KNIFE = Thing(INHUT,'KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',0,2)
+
+#HIDDENROOM
+Way(HIDDENROOM,INHUT,['XYZZY'],'Strange Mist','A Strange Mist is located here.','You enter the mist.')
+
+
+SKELETON = Character(HIDDENROOM,'SKELETON','A Skeleton' ,'A moist, glistening skeleton' ,"A moist, glistening creature of the undead, who I can't recognise from any features.",random.randrange(2,12))
+BONE = Thing(SKELETON.inventory,'BONE','A Bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.',1)
+BOW = Thing(SKELETON.inventory,'BOW','A Bow','A Solid Wooden Bow.',' it seems to have been made from pure Rivenwood.',3,7)
+DIAMOND_RING = Thing(SKELETON.inventory,'DIAMOND RING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',500)
+BONE.hidden = True
 
 #BEACH
 Way(BEACH,PALMFOREST,['N','NORTH'],'North','North by a narrow track','A short walk later ...')
@@ -65,7 +78,8 @@ Way(GRAVEYARD,VILLAGE,['PASS','VILLAGE'],'Secret Passage','Underground by a dark
 Way(GRAVEYARD,CURSEDGLADE,['PATH','CURSEDGLADE'],'Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'')
 
 ZOMBIE = Character(GRAVEYARD, 'ZOMBIE' ,'A Zombie' ,'A rotting Zombie' ,'A rotting creature of the undead, who I believe used to be called "Bob"',random.randrange(1,13))
-BRAIN = Thing(ZOMBIE.inventory,'BRAIN','A Brain','A bloody Brain.','Looks like it has just been removed.')
+BRAIN = Thing(ZOMBIE.inventory,'BRAIN','A Brain','A bloody Brain.','Looks like it has just been removed.',1)
+CLUB = Thing(ZOMBIE.inventory,'CLUB','A Club','A Iron Club.',' it seems to have been made from pure steel and rivenwood.',2,5)
 
 #VILLAGE
 Way(VILLAGE,TAVERN,['IN','IN TAVERN'],'In','In too the Tavern.',"You enter the Tavern with it's hot, stuffy air.")
@@ -76,18 +90,10 @@ Way(VILLAGE,FOREST,['N','NORTH']     ,'North','North by a thin, narrow track.','
 Way(CURSEDGLADE,GRAVEYARD,['PASS','GRAVEYARD'],'Hidden Tunnel','Underground by a dark, thin, narrow passage.',"A long crawl later ...")
 Way(CURSEDGLADE,STREAM,['XYZZY'],'Magic Word','Magic word unknown to adventurer','Wow! how did i get here?',True)
 
-
-DIAMOND_RING = Thing(CURSEDGLADE,'DIAMOND RING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',500)
-
-SKELETON = Character(STREAM,'SKELETON','A Skeleton' ,'A moist, glistening skeleton' ,"A moist, glistening creature of the undead, who I can't recognise from any features.",random.randrange(2,12))
-BONE = Thing(SKELETON.inventory,'BONE','A Bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.')
-BONE.hidden = True
-
-
 #TAVERN
 Way(TAVERN,VILLAGE,['OUT','OUT TAVERN'],'Out','Out of the Tavern.','You leave the Tavern for the fresh air.')
 
-ALE = Thing(TAVERN,'ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.')
+ALE = Thing(TAVERN,'ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.',1)
 
 
 
@@ -103,11 +109,10 @@ print 'lands of Hawcry, a land'
 print 'once ruled by giant eagles'
 print 'of immense strength and'
 print 'great power.'
-print 'You are a wanderer whose'
-print 'aim in life is too collect things.'
-print 'Your goal. Collect all'
-print 'things in the region. There are ' + str( Thing.thingCount )
-print ' in total. FIND THOSE OBJECTS!'
+#print 'aim in life is too collect things.'
+#print 'Your goal. Collect all'
+#print 'things in the region. There are ' + str( Thing.thingCount )
+#print ' in total. FIND THOSE OBJECTS!'
 #raw_input('Press enter to continue.')
 print
 print
@@ -117,7 +122,7 @@ PLAYER = Character( STREAM
                    ,'ME'
                    , name
                    ,'the main character'
-                   ,'this is the guy we care about' 
+                   ,'this is the guy we care about'
                    ,random.randrange(6,10)
                    ,40)
 
@@ -135,7 +140,7 @@ Thing(PLAYER.inventory,'NOTE','a Note','an interesting small note.','It reads,"X
 #Character.listCharacters()
 
 PLAYER.location.displayLocation(PLAYER)
- 
+
 #perpetual loop
 while True:
 

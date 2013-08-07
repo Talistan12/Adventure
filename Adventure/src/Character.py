@@ -78,10 +78,11 @@ class Character:
           try:
               weapon = self.inventory.findThing(weaponCode)
               print "You swing at " + character.shortName + " with " + weapon.shortName
-              if random.randint(1,3)==1:
+              if random.randint(1,2)==1:
                   print "You got a direct hit!"
                   character.hitPoints = character.hitPoints - (self.damagePoints + weapon.damagePoints)
                   if character.hitPoints <= 0:
+                      character.inventory.quickDropAll(character)
                       self.location.removeCharacter(character)
                       print "you have killed your foe!"
 

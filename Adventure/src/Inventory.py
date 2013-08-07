@@ -142,6 +142,10 @@ class Inventory:
           return True
       else:
         return False
-
+   
+   def quickDropAll(self,player):
+             for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
+                 print player.shortName + ' dropped ' + thing.shortName + '!'
+                 thing.moveThing(player.inventory, player.location)
 
 
