@@ -22,7 +22,7 @@ CURSEDGLADE = Location('At the Cursed Glade','You have arrived at a dark, Cursed
 TAVERN = Location('In the Tavern','You have arrived at a tavern busy with people. It is called the Jolly Pig.')
 SEA = Location('On the Sea','You are standing on a boat, crossing the briny blue.')
 HIDDENROOM = Location('In the Hidden Room','You are standing in a room, full of secrets and treasure.')
-
+UNKNOWNBEACH = Location('At Unknown Beach','You are standing on a Unknown Beach, covered in little mushrooms and paths into the forest.')
 
 #STREAM
 Way(STREAM, HUT       ,['N','NORTH'],'North','North by a narrow track','A short walk later ...')
@@ -47,20 +47,28 @@ Way(INHUT,HUT  ,['OUT','DOOR'],'Out','Out front door','The door creaks as you le
 Way(INHUT,ATTIC,['UP','U','MAGIC'],'Up','Up a ladder to the ceiling','You climb into the ceiling')
 Way(INHUT,HIDDENROOM,['XYZZY'],'Strange Mist','A Strange Mist is located here.','You enter the mist.')
 
-KNIFE = Thing(INHUT,'KNIFE','A Knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',0,2)
+KNIFE = Thing(INHUT,'KNIFE','a knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',0,2)
 
 #HIDDENROOM
 Way(HIDDENROOM,INHUT,['XYZZY'],'Strange Mist','A Strange Mist is located here.','You enter the mist.')
 
 
-SKELETON = Character(HIDDENROOM,'SKELETON','A Skeleton' ,'A moist, glistening skeleton' ,"A moist, glistening creature of the undead, who I can't recognise from any features.",random.randrange(2,12))
-BONE = Thing(SKELETON.inventory,'BONE','A Bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.',1)
-BOW = Thing(SKELETON.inventory,'BOW','A Bow','A Solid Wooden Bow.',' it seems to have been made from pure Rivenwood.',3,7)
+SKELETON = Character(HIDDENROOM,'SKELETON','a skeleton' ,'A moist, glistening skeleton' ,"A moist, glistening creature of the undead, who I can't recognise from any features.",random.randrange(2,12))
+BONE = Thing(SKELETON.inventory,'BONE','a bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.',1)
+BOW = Thing(SKELETON.inventory,'BOW','a bow','A Solid Wooden Bow.',' it seems to have been made from pure Rivenwood.',3,7)
 DIAMOND_RING = Thing(SKELETON.inventory,'DIAMOND RING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',500)
 BONE.hidden = True
 
 #BEACH
 Way(BEACH,PALMFOREST,['N','NORTH'],'North','North by a narrow track','A short walk later ...')
+Way(BEACH,SEA,['S','SEA'],'The Sea','On to the Sea. Ready for a rough ride?','A few months later ...')
+
+#SEA
+Way(SEA,BEACH,['B','BEACH'],'The Beach.','Back to the Beach where you belong.','A few months later ...')
+Way(SEA,UNKNOWNBEACH,['S','SEA'],'The Unknown Beach.','On to Unknown shores. Ready for adventure?','A few months later ...')
+
+#UNKNOWNBEACH
+Way(UNKNOWNBEACH,SEA,['UB','UNKOWNBEACH'],'The Sea','On to the Sea. Ready for a rough ride?','A few months later ...')
 
 #ATTIC
 Way(ATTIC,INHUT,['D','DOWN'],'Down','Down through the trap door','Going down')
@@ -68,7 +76,7 @@ Way(ATTIC,INHUT,['D','DOWN'],'Down','Down through the trap door','Going down')
 #DOCKS
 Way(DOCKS,PALMFOREST,['W','WEST'],'West','West by a narrow track','A short walk later ...')
 
-BOAT = Thing(DOCKS,'Boat','A Small One-Man Craft.','The Fresh Cucumber',"          ",100)
+BOAT = Thing(DOCKS,'BOAT','a boat','A Small One-Man Craft.','The Fresh Cucumber',100)
 
 #FOREST
 Way(FOREST,GRAVEYARD,['N','NORTH'],'North','North by a thin, narrow track.',"A short walk later ...")
@@ -77,9 +85,9 @@ Way(FOREST,GRAVEYARD,['N','NORTH'],'North','North by a thin, narrow track.',"A s
 Way(GRAVEYARD,VILLAGE,['PASS','VILLAGE'],'Secret Passage','Underground by a dark, thin, narrow passage.',"A long crawl later ...")
 Way(GRAVEYARD,CURSEDGLADE,['PATH','CURSEDGLADE'],'Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'')
 
-ZOMBIE = Character(GRAVEYARD, 'ZOMBIE' ,'A Zombie' ,'A rotting Zombie' ,'A rotting creature of the undead, who I believe used to be called "Bob"',random.randrange(1,13))
-BRAIN = Thing(ZOMBIE.inventory,'BRAIN','A Brain','A bloody Brain.','Looks like it has just been removed.',1)
-CLUB = Thing(ZOMBIE.inventory,'CLUB','A Club','A Iron Club.',' it seems to have been made from pure steel and rivenwood.',2,5)
+ZOMBIE = Character(GRAVEYARD, 'ZOMBIE' ,'a zombie' ,'A rotting Zombie' ,'A rotting creature of the undead, who I believe used to be called "Bob"',random.randrange(4,13),60)
+BRAIN = Thing(ZOMBIE.inventory,'BRAIN','a brain','A bloody Brain.','Looks like it has just been removed.',1)
+CLUB = Thing(ZOMBIE.inventory,'CLUB','a club','A Iron Club.',' it seems to have been made from pure steel and rivenwood.',2,5)
 
 #VILLAGE
 Way(VILLAGE,TAVERN,['IN','IN TAVERN'],'In','In too the Tavern.',"You enter the Tavern with it's hot, stuffy air.")
@@ -93,7 +101,7 @@ Way(CURSEDGLADE,STREAM,['XYZZY'],'Magic Word','Magic word unknown to adventurer'
 #TAVERN
 Way(TAVERN,VILLAGE,['OUT','OUT TAVERN'],'Out','Out of the Tavern.','You leave the Tavern for the fresh air.')
 
-ALE = Thing(TAVERN,'ALE','Some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.',1)
+ALE = Thing(TAVERN,'ALE','some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.',1)
 
 
 
@@ -102,7 +110,7 @@ print 'You have just woken up. Your'
 print "memory is hazy and you can't "
 print 'even remember your name and'
 print 'decide to give yourself one'
-name = raw_input('pick a name. ')
+name = raw_input('pick a name. ').replace('\r', '')
 print ''
 print 'You think you are in the'
 print 'lands of Hawcry, a land'
@@ -146,5 +154,8 @@ while True:
 
     PLAYER.doTurn()
 
-
+    if PLAYER.hitPoints <= 0:
+        print "I'm reincarnating you now!"
+        PLAYER.moveCharacter(PLAYER.location, STREAM)
+        PLAYER.hitPoints = 40
 

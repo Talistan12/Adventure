@@ -25,6 +25,7 @@ class Character:
         self.damagePoints = damagePoints
         self.hitPoints = hitPoints
         self.looks = 0
+        self.oldCommand = ""
 
         Character.characters.append(self)
 
@@ -85,12 +86,30 @@ class Character:
                       character.inventory.quickDropAll(character)
                       self.location.removeCharacter(character)
                       print "you have killed your foe!"
-
-                  return True
+                  else:
+                      print "It has " + str(character.hitPoints) + " health left!"
+          
+                  #return True
 
               else:
                   print "You missed!"
-                  return True
+                  #return True
+              
+              #Foe fights back
+              if character.hitPoints > 0:
+                  print character.shortName + " takes a swing at you!" # + weapon.shortName
+                  if random.randint(1,2)==1:
+                      print "It hit you!!"
+                      self.hitPoints = self.hitPoints - character.damagePoints #+ weapon.damagePoints)
+                      if self.hitPoints <= 0:
+                          self.inventory.quickDropAll(self)
+                          print "YOU ............... ARE ............................... DEEEEEEEEAAAAAAAAD!"
+                      else:
+                          print "You have " + str(self.hitPoints) + " health left!"
+                  else:
+                      print "It missed!"
+              return True
+              
           except userException,e:
               debug('Player is not holding weapon')
               print "You don't have " + weaponCode.capitalize()
@@ -105,8 +124,11 @@ class Character:
     # All commands are processed here.  Returns a Location
          newLocation = self.location
          print
+         
          command = raw_input ('What next, ' + self.shortName + '?').replace('\r', '')
          command = command.upper().strip()
+         if command == 'AGAIN':
+             command = self.oldCommand
          if command <> '':
              if self.location.interpretCommand(self,command):
                 debug('Location command')
@@ -118,6 +140,7 @@ class Character:
                 debug('Fight Character Command')
              else:
                 print 'huh?'
+         self.oldCommand = command
 
 
     def doTurn(self):
