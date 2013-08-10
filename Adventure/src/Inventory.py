@@ -44,7 +44,7 @@ class Inventory:
 
    def findThing(self,thingCode):
          for thing in self.things:
-            if thing.code == thingCode:
+            if thingCode in thing.codes:
                return thing
          raise userException("No such thing")
 
@@ -59,12 +59,12 @@ class Inventory:
    def addThing(self, thing):
 
      self.things.append(thing)
-     debug( "Added " + thing.code + " to inventory as it's thing %d " % self.thingCount())
+     debug( "Added " + thing.shortName + " to inventory as it's thing %d " % self.thingCount())
 
    def removeThing(self, thing):
 
      self.things.remove(thing)
-     debug( "Removed " + thing.code + " from inventory")
+     debug( "Removed " + thing.shortName + " from inventory")
 
 
    def dropThing(self, player, getCommand):
@@ -89,7 +89,7 @@ class Inventory:
 
       DroppedIt = False
       for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
-              if thingCode in ['ALL',thing.code]:
+              if thingCode in (['ALL']+[thing.codes]):
                  print 'Dropped ' + thing.shortName + '!'
                  thing.moveThing(player.inventory, player.location)
                  DroppedIt = True

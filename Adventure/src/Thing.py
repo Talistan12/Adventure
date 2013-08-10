@@ -15,7 +15,7 @@ class Thing:
    def thingCount():
        return len(Thing.things)
 
-   def __init__(self, location, code, shortName, longName, description):
+   def __init__(self, location, codes, shortName, longName, description):
       if location.shortName == 'RANDOMLOCATION':
           debug( "finding random location" )
           randomLocations = random.sample(Location.locations, 1)
@@ -23,17 +23,17 @@ class Thing:
           debug(self.location.shortName)
       else:
           self.location = location
-      self.code = code
+      self.codes = codes
       self.shortName = shortName
       self.longName = longName
       self.description = description
       self.hidden = False
-      self.looks = 0 
+      self.looks = 0
 
       Thing.things.append(self)
-    
-      debug( "New Thing %d " % Thing.thingCount() + self.code )
-    
+
+      debug( "New Thing %d " % Thing.thingCount() + self.shortName )
+
       #now add the thing to the location
       self.location.addThing(self)
 
@@ -51,50 +51,49 @@ class Thing:
        originLocation.removeThing(self)
        destLocation.addThing(self)
        self.location = destLocation
-       
-class Treasure(Thing):   
- 
-   def __init__(self, location, code, shortName, longName, description, valueGold):
-       
-      Thing.__init__(self,location, code, shortName, longName, description)
+
+class Treasure(Thing):
+
+   def __init__(self, location, codes, shortName, longName, description, valueGold):
+
+      Thing.__init__(self,location, codes, shortName, longName, description)
       self.hidden = True
       self.valueGold = valueGold
 
-     
-class Weapon(Thing):   
- 
-   def __init__(self, location, code, shortName, longName, description, actions, damagePoints):
- 
-      Thing.__init__(self,location, code, shortName, longName, description)
+
+class Weapon(Thing):
+
+   def __init__(self, location, codes, shortName, longName, description, actions, damagePoints):
+
+      Thing.__init__(self,location, codes, shortName, longName, description)
       self.actions = actions
       self.damagePoints = damagePoints
-      
-class Food(Thing):   
- 
-   def __init__(self, location, code, shortName, longName, description, eatMessage, valueFood):
-       
-      Thing.__init__(self,location, code, shortName, longName, description)
+
+class Food(Thing):
+
+   def __init__(self, location, codes, shortName, longName, description, eatMessage, valueFood):
+
+      Thing.__init__(self,location, codes, shortName, longName, description)
       self.eatMessage = eatMessage
       self.valueFood = valueFood
-      
-class Drink(Thing):   
- 
-   def __init__(self, location, code, shortName, longName, description, eatMessage, valueFood):
-       
-      Thing.__init__(self,location, code, shortName, longName, description)
+
+class Drink(Thing):
+
+   def __init__(self, location, codes, shortName, longName, description, eatMessage, valueFood):
+
+      Thing.__init__(self,location, codes, shortName, longName, description)
       self.eatMessage = eatMessage
       self.valueFood = valueFood
- 
- 
-class Junk(Thing):   
-   def __init__(self, location, code, shortName, longName, description):
-       
-      Thing.__init__(self,location, code, shortName, longName, description)
-      
-class Transport(Thing):   
- 
-   def __init__(self, location, code, shortName, longName, description, cost):
-       
-      Thing.__init__(self,location, code, shortName, longName, description)
+
+
+class Junk(Thing):
+   def __init__(self, location, codes, shortName, longName, description):
+
+      Thing.__init__(self,location, codes, shortName, longName, description)
+
+class Transport(Thing):
+
+   def __init__(self, location, codes, shortName, longName, description, cost):
+
+      Thing.__init__(self,location, codes, shortName, longName, description)
       self.cost = cost
-       

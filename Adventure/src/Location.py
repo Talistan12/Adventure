@@ -118,13 +118,13 @@ class Location:
    def addThing(self, thing):
 
      self.things.append(thing)
-     debug( "Added " + thing.code + " to " + self.shortName + " as it's thing %d " % self.thingCount())
+     debug( "Added " + thing.shortName + " to " + self.shortName + " as it's thing %d " % self.thingCount())
 
 
    def removeThing(self, thing):
 
      self.things.remove(thing)
-     debug( "Removed " + thing.code + " from " + self.shortName)
+     debug( "Removed " + thing.shortName + " from " + self.shortName)
 
 
 
@@ -208,7 +208,7 @@ class Location:
 
       GotIt = False
       for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
-          if thingCode in ['ALL',thing.code]:
+          if thingCode in (['ALL']+[thing.codes]):
                  print 'Got ' + thing.shortName + '!'
                  thing.moveThing(player.location, player.inventory)
                  GotIt = True
