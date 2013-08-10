@@ -1,7 +1,7 @@
 from Location import Location, Way
 from Inventory import Inventory
 from Character import Character
-from Thing import Thing
+from Thing import Thing, Treasure, Weapon, Food, Drink, Junk, Transport
 from Util import userException, debug
 import random
 
@@ -34,9 +34,9 @@ WOWSTAFF = Thing(RANDOMLOCATION, 'WOWSTAFF','WOWStaff','The World Of Warcraft St
 Way(STREAM, HUT       ,['N','NORTH'],'North','North by a narrow track','A short walk later ...')
 Way(STREAM, PALMFOREST,['W','WEST'] ,'West','West by a narrow track','A short walk later ...')
 
-WATER   = Thing(STREAM, 'WATER','some Water','a bottle of water','Not mineral water, but smells okay.')
-APPLE   = Thing(STREAM, 'APPLE','an Apple','a juicy looking Apple',"It is pulsating strangely. I'd better not eat it.")
-RATIONS = Thing(STREAM, 'RATIONS','some Rations','a bag of Rations.',"The Rations look stale, but there all I've got till I reach an Inn or a Tavern")
+WATER   = Drink(STREAM, 'WATER','some Water','a bottle of water','Not mineral water, but smells okay.',"That was tasteless, but I feel better.",5)
+APPLE   = Food(STREAM, 'APPLE','an Apple','a juicy looking Apple',"It is pulsating strangely. I'd better not eat it.","Not bad.  In fact good!",10)
+RATIONS = Food(STREAM, 'RATIONS','some Rations','a bag of Rations.',"The Rations look stale, but there all I've got till I reach an Inn or a Tavern","Wow i was hungry. I've gobbled it all up.",20)
 
 #HUT
 Way(HUT, STREAM ,['S','SOUTH'],'South','South by a narrow track','A short walk later ...')
@@ -53,16 +53,16 @@ Way(INHUT,HUT  ,['OUT','DOOR'],'Out','Out front door','The door creaks as you le
 Way(INHUT,ATTIC,['UP','U','MAGIC'],'Up','Up a ladder to the ceiling','You climb into the ceiling')
 Way(INHUT,HIDDENROOM,['XYZZY'],'Strange Mist','A Strange Mist is located here.','You enter the mist.')
 
-KNIFE = Thing(INHUT,'KNIFE','a knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',0,2)
+KNIFE = Weapon(INHUT,'KNIFE','a knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',['stab','slash'],2)
 
 #HIDDENROOM
 Way(HIDDENROOM,INHUT,['XYZZY'],'Strange Mist','A Strange Mist is located here.','You enter the mist.')
 
 
 SKELETON = Character(HIDDENROOM,'SKELETON','a skeleton' ,'A moist, glistening skeleton' ,"A moist, glistening creature of the undead, who I can't recognise from any features.",random.randrange(2,12))
-BONE = Thing(SKELETON.inventory,'BONE','a bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.',1)
-BOW = Thing(SKELETON.inventory,'BOW','a bow','A Solid Wooden Bow.',' it seems to have been made from pure Rivenwood.',3,7)
-DIAMOND_RING = Thing(SKELETON.inventory,'DIAMOND RING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',500)
+BONE = Junk(SKELETON.inventory,'BONE','a bone','A glistening Bone.','Looks like it is the last remains of the Skeleton.')
+BOW = Weapon(SKELETON.inventory,'BOW','a bow','A Solid Wooden Bow.',' it seems to have been made from pure Rivenwood.',['fire an arrow'],7)
+DIAMOND_RING = Treasure(SKELETON.inventory,'DIAMOND RING','A Diamond Ring','A shiny Diamond Ring','It is a very shiny Diamond Ring.  Looks beautiful.',500)
 BONE.hidden = True
 
 #BEACH
@@ -82,7 +82,7 @@ Way(ATTIC,INHUT,['D','DOWN'],'Down','Down through the trap door','Going down')
 #DOCKS
 Way(DOCKS,PALMFOREST,['W','WEST'],'West','West by a narrow track','A short walk later ...')
 
-BOAT = Thing(DOCKS,'BOAT','a boat','A Small One-Man Craft.','The Fresh Cucumber',100)
+BOAT = Transport(DOCKS,'BOAT','a boat','A Small One-Man Craft.','The Fresh Cucumber',100)
 
 #FOREST
 Way(FOREST,GRAVEYARD,['N','NORTH'],'North','North by a thin, narrow track.',"A short walk later ...")
@@ -92,8 +92,8 @@ Way(GRAVEYARD,VILLAGE,['PASS','VILLAGE'],'Secret Passage','Underground by a dark
 Way(GRAVEYARD,CURSEDGLADE,['PATH','CURSEDGLADE'],'Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'')
 
 ZOMBIE = Character(GRAVEYARD, 'ZOMBIE' ,'a zombie' ,'A rotting Zombie' ,'A rotting creature of the undead, who I believe used to be called "Bob"',random.randrange(4,13),60)
-BRAIN = Thing(ZOMBIE.inventory,'BRAIN','a brain','A bloody Brain.','Looks like it has just been removed.',1)
-CLUB = Thing(ZOMBIE.inventory,'CLUB','a club','A Iron Club.',' it seems to have been made from pure steel and rivenwood.',2,5)
+BRAIN = Junk(ZOMBIE.inventory,'BRAIN','a brain','A bloody Brain.','Looks like it has just been removed.')
+CLUB = Weapon(ZOMBIE.inventory,'CLUB','a club','A Iron Club.',' it seems to have been made from pure steel and rivenwood.',['smash','hit','clobber'],5)
 
 #VILLAGE
 Way(VILLAGE,TAVERN,['IN','IN TAVERN'],'In','In too the Tavern.',"You enter the Tavern with it's hot, stuffy air.")
@@ -107,7 +107,7 @@ Way(CURSEDGLADE,STREAM,['XYZZY'],'Magic Word','Magic word unknown to adventurer'
 #TAVERN
 Way(TAVERN,VILLAGE,['OUT','OUT TAVERN'],'Out','Out of the Tavern.','You leave the Tavern for the fresh air.')
 
-ALE = Thing(TAVERN,'ALE','some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.',1)
+ALE = Drink(TAVERN,'ALE','some Ale','A pint of Ale','Looks good. I feel like a pint of Ale.',"That really hit the spot.  I think i can take on an army now.",100)
 
 
 

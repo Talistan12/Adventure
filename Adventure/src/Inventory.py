@@ -1,4 +1,5 @@
 from Util import userException, debug
+from Thing import Treasure, Food, Drink
 
 class Inventory:
    'Common base class for all inventories'
@@ -50,7 +51,8 @@ class Inventory:
    def score(self):
       myScore = 0
       for thing in self.things:
-           myScore += thing.valueGold * 10
+          if isinstance(thing,Treasure):
+             myScore += thing.valueGold * 10
 
       return myScore
 
@@ -110,18 +112,72 @@ class Inventory:
          return False
 
       try:
-        Thing = self.findThing(thingCode)
-        print Thing.description
+        thing = self.findThing(thingCode)
+        print thing.description
 
       except userException,e:
          try:
-            Thing = player.location.findThing(thingCode)
-            print 'I do not have ' +  Thing.shortName + ', but I can see it here.'
+            thing = player.location.findThing(thingCode)
+            print 'I do not have ' +  thing.shortName + ', but I can see it here.'
 
          except userException,e:
             print "You don't have " + thingCode.lower() + "!"
 
       return True
+ 
+   def eatThing(self, player, eatCommand):
+      debug( 'Searching for thing.. ' + eatCommand)
+      if eatCommand.split()[0] == 'EAT':
+         thingCode = eatCommand.split()[1]
+      else:
+         return False
+
+      try:
+        thing = self.findThing(thingCode)
+        if isinstance(thing,Food):
+            print thing.eatMessage
+            player.hitPoints = player.hitPoints + thing.valueFood
+            self.removeThing(thing)
+        else:
+            print thing.shortName + " is not for eating."
+
+      except userException,e:
+         try:
+            thing = player.location.findThing(thingCode)
+            print 'I do not have ' +  thing.shortName + ', but I can see it here.'
+
+         except userException,e:
+            print "You don't have " + thingCode.lower() + "!"
+
+      return True
+  
+   def drinkThing(self, player, eatCommand):
+      debug( 'Searching for thing.. ' + eatCommand)
+      if eatCommand.split()[0] == 'DRINK':
+         thingCode = eatCommand.split()[1]
+      else:
+         return False
+
+      try:
+        thing = self.findThing(thingCode)
+        if isinstance(thing,Drink):
+            print thing.eatMessage
+            player.hitPoints = player.hitPoints + thing.valueFood
+            self.removeThing(thing)
+        else:
+            print thing.shortName + " is not for drinking."
+
+      except userException,e:
+         try:
+            thing = player.location.findThing(thingCode)
+            print 'I do not have ' +  thing.shortName + ', but I can see it here.'
+
+         except userException,e:
+            print "You don't have " + thingCode.lower() + "!"
+
+      return True
+  
+  
 
    def interpretCommand(self,player,command):
    # All commands related to an Inventory
@@ -136,6 +192,12 @@ class Inventory:
          return True
       elif self.lookThing(player, command):
          debug('Look Thing Command')
+         return True
+      elif self.eatThing(player, command):
+         debug('Eat Thing Command')
+         return True
+      elif self.drinkThing(player, command):
+         debug('Drink Thing Command')
          return True
       elif ( command in ['S','SCORE']):
           debug('SCORE command')

@@ -15,9 +15,9 @@ class Thing:
    def thingCount():
        return len(Thing.things)
 
-   def __init__(self, location, code, shortName, longName, description, valueGold = 0, damagePoints = 0,):
+   def __init__(self, location, code, shortName, longName, description):
       if location.shortName == 'RANDOMLOCATION':
-          debug( "findin random loc" )
+          debug( "finding random location" )
           randomLocations = random.sample(Location.locations, 1)
           self.location = randomLocations[0]
           debug(self.location.shortName)
@@ -27,11 +27,9 @@ class Thing:
       self.shortName = shortName
       self.longName = longName
       self.description = description
-      self.valueGold = valueGold
-      self.damagePoints = damagePoints
-      self.looks = 0
       self.hidden = False
-    
+      self.looks = 0 
+
       Thing.things.append(self)
     
       debug( "New Thing %d " % Thing.thingCount() + self.code )
@@ -53,3 +51,50 @@ class Thing:
        originLocation.removeThing(self)
        destLocation.addThing(self)
        self.location = destLocation
+       
+class Treasure(Thing):   
+ 
+   def __init__(self, location, code, shortName, longName, description, valueGold):
+       
+      Thing.__init__(self,location, code, shortName, longName, description)
+      self.hidden = True
+      self.valueGold = valueGold
+
+     
+class Weapon(Thing):   
+ 
+   def __init__(self, location, code, shortName, longName, description, actions, damagePoints):
+ 
+      Thing.__init__(self,location, code, shortName, longName, description)
+      self.actions = actions
+      self.damagePoints = damagePoints
+      
+class Food(Thing):   
+ 
+   def __init__(self, location, code, shortName, longName, description, eatMessage, valueFood):
+       
+      Thing.__init__(self,location, code, shortName, longName, description)
+      self.eatMessage = eatMessage
+      self.valueFood = valueFood
+      
+class Drink(Thing):   
+ 
+   def __init__(self, location, code, shortName, longName, description, eatMessage, valueFood):
+       
+      Thing.__init__(self,location, code, shortName, longName, description)
+      self.eatMessage = eatMessage
+      self.valueFood = valueFood
+ 
+ 
+class Junk(Thing):   
+   def __init__(self, location, code, shortName, longName, description):
+       
+      Thing.__init__(self,location, code, shortName, longName, description)
+      
+class Transport(Thing):   
+ 
+   def __init__(self, location, code, shortName, longName, description, cost):
+       
+      Thing.__init__(self,location, code, shortName, longName, description)
+      self.cost = cost
+       
