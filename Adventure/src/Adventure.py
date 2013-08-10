@@ -23,6 +23,12 @@ TAVERN = Location('In the Tavern','You have arrived at a tavern busy with people
 SEA = Location('On the Sea','You are standing on a boat, crossing the briny blue.')
 HIDDENROOM = Location('In the Hidden Room','You are standing in a room, full of secrets and treasure.')
 UNKNOWNBEACH = Location('At Unknown Beach','You are standing on a Unknown Beach, covered in little mushrooms and paths into the forest.')
+#Special locations
+RANDOMLOCATION = Location('RANDOMLOCATION','You are standing in a land full of random numbers everywhere. However you got here, there is no way back.')
+
+#RANDOMLOCATION
+WOWSTAFF = Thing(RANDOMLOCATION, 'WOWSTAFF','WOWStaff','The World Of Warcraft Staff.',"The Staff is made of the finest Ironwood, and looks a long stick with a priceless jewel on the end.")
+#STAFF' or '
 
 #STREAM
 Way(STREAM, HUT       ,['N','NORTH'],'North','North by a narrow track','A short walk later ...')

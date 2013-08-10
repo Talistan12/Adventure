@@ -1,4 +1,6 @@
 from Util import userException, debug
+from Location import Location
+import random
 
 class Thing:
    'Common base class for all things'
@@ -14,7 +16,13 @@ class Thing:
        return len(Thing.things)
 
    def __init__(self, location, code, shortName, longName, description, valueGold = 0, damagePoints = 0,):
-      self.location = location
+      if location.shortName == 'RANDOMLOCATION':
+          debug( "findin random loc" )
+          randomLocations = random.sample(Location.locations, 1)
+          self.location = randomLocations[0]
+          debug(self.location.shortName)
+      else:
+          self.location = location
       self.code = code
       self.shortName = shortName
       self.longName = longName
@@ -23,11 +31,11 @@ class Thing:
       self.damagePoints = damagePoints
       self.looks = 0
       self.hidden = False
-
+    
       Thing.things.append(self)
-
+    
       debug( "New Thing %d " % Thing.thingCount() + self.code )
-
+    
       #now add the thing to the location
       self.location.addThing(self)
 

@@ -7,6 +7,7 @@ class Inventory:
    def __init__(self):
       self.looks = 0
       self.things = []
+      self.shortName = "INVENTORY"
       debug( "New Inventory %d " % Inventory.invCount)
       Inventory.invCount += 1
 

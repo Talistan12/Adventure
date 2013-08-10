@@ -12,7 +12,7 @@ class Way:
       self.hidden = hidden
       self.looks = 0
       debug( "New Way " + shortDesc + " to " + destLocation.shortName)
-      
+
       originLocation.addWay(self)
 
    def displayWay(self,looks):
@@ -28,27 +28,30 @@ class Location:
    'Common base class for all locations'
 
    locations = []
- 
+
    @staticmethod
    def listLocations():
          print 'Display all locations..'
          for location in Location.locations:
-               location.displayLocation() 
-               
+               location.displayLocation()
+
    @staticmethod
    def locationCount():
        return len(Location.locations)
- 
+
    def __init__(self, shortName, longName ):
-      self.code = '' #DONT NEED THIS ANYMORE
+
+
       self.shortName = shortName
       self.longName = longName
       self.looks = 0
       self.ways = []
       self.things = []
       self.characters = []
-      
-      Location.locations.append(self)
+
+      #don't add the random location to the location list, otherwise, things will end up there, by random
+      if shortName <> "RANDOMLOCATION":
+        Location.locations.append(self)
 
       debug( "New Location %d" % len(Location.locations) + self.shortName)
 
@@ -111,26 +114,26 @@ class Location:
       self.displayWays(self.looks)
       self.displayThings()
       self.displayCharacters(player)
- 
+
    def addThing(self, thing):
 
      self.things.append(thing)
-     debug( "Added " + thing.code + " to " + self.code + " as it's thing %d " % self.thingCount())
+     debug( "Added " + thing.code + " to " + self.shortName + " as it's thing %d " % self.thingCount())
 
 
    def removeThing(self, thing):
 
      self.things.remove(thing)
-     debug( "Removed " + thing.code + " from " + self.code)
-     
- 
+     debug( "Removed " + thing.code + " from " + self.shortName)
+
+
 
 
 
    def addWay(self, way):
 
      self.ways.append(way)
-     debug( "Added " + way.shortDesc + " to " + self.code + " as it's way %d " % self.wayCount())
+     debug( "Added " + way.shortDesc + " to " + self.shortName + " as it's way %d " % self.wayCount())
 
 
 
@@ -138,13 +141,13 @@ class Location:
    def addCharacter(self, character):
 
      self.characters.append(character)
-     debug( "Added " + character.shortName + " to " + self.code + " as it's character %d " % self.characterCount())
+     debug( "Added " + character.shortName + " to " + self.shortName + " as it's character %d " % self.characterCount())
 
    def removeCharacter(self, character):
 
      self.characters.remove(character)
-     debug( "Removed " + character.shortName + " from " + self.code)
-  
+     debug( "Removed " + character.shortName + " from " + self.shortName)
+
 
    def goWay(self, player, wayCommand):
       #returns a Location unless an exception is raised.
@@ -217,7 +220,7 @@ class Location:
 
       except userException,e:
          print "what? I can't pick " + thingCode.lower() + " up!"
-     
+
       return True
 
    def lookCharacter(self, lookCommand):
@@ -238,7 +241,7 @@ class Location:
          #So the lookThing routine will either find it or say its not here.
          #print "There is no " + characterCode.lower() + " here!"
          return False
- 
+
 #   def fightCharacter(self, player, fightCommand):
 #      debug( 'Searching for character.. ' + fightCommand)
 #      if lookCommand.split()[0] == 'FIGHT':
@@ -255,10 +258,10 @@ class Location:
 #        else:
 #          print "With what?"
 #          return True
-#        
-#        
-#        
-#        
+#
+#
+#
+#
 #        print character.description
 #        return True
 #
@@ -266,8 +269,8 @@ class Location:
 #         debug('Player is looking but if its a character its not here')
 #         print "There is no " + characterCode.lower + " here to fight."
 #         return True
-#     
-         
+#
+
    def interpretCommand(self,player,command):
    # All commands related to a location, or stuff at locations (things, characters)
    # Return True if the command was understood in this context.
@@ -295,4 +298,4 @@ class Location:
 #          return True
       else:
           return False
-         
+
