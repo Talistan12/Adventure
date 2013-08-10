@@ -1,6 +1,10 @@
 from Util import userException, debug
 from Inventory import Inventory
 import random
+from Thing import Weapon
+from Location import Location
+NOWHERE = Location('NOWHERE','You can not go here, but your hands can.')
+HANDS = Weapon(NOWHERE,'HANDS','your fists','A couple of calloused hands','Look out I am desperate now.',['punch','thump'],2)
 
 class Character:
     ' A player or NPC in the game'
@@ -50,7 +54,7 @@ class Character:
 
 
     def fightCharacter(self, fightCommand):
-      fightingWords = ['FIGHT','ATTACK','KILL']
+      fightingWords = ['FIGHT','ATTACK','KILL','HIT']
       fightWord = fightCommand.split()[0]
       debug( 'Searching for character.. ' + fightCommand)
       if (fightCommand in fightingWords):
@@ -77,23 +81,30 @@ class Character:
       if fightCommand.split()[2] == 'WITH':
           weaponCode = fightCommand.split()[3]
           try:
-              weapon = self.inventory.findThing(weaponCode)
-              print "You swing at " + character.shortName + " with " + weapon.shortName
-              if random.randint(1,2)==1:
-                  print "You got a direct hit!"
-                  character.hitPoints = character.hitPoints - (self.damagePoints + weapon.damagePoints)
-                  if character.hitPoints <= 0:
-                      character.inventory.quickDropAll(character)
-                      self.location.removeCharacter(character)
-                      print "you have killed your foe!"
+              if weaponCode in ['HANDS','FISTS']:
+                  weapon = HANDS
+              else:    
+                  weapon = self.inventory.findThing(weaponCode)
+              if isinstance(weapon, Weapon):
+                  print "You " + random.sample(weapon.actions,1)[0] + " " + character.shortName + " with " + weapon.shortName
+                  if random.randint(1,2)==1:
+                      print "You got a direct hit!"
+                      character.hitPoints = character.hitPoints - (self.damagePoints + weapon.damagePoints)
+                      if character.hitPoints <= 0:
+                          character.inventory.quickDropAll(character)
+                          self.location.removeCharacter(character)
+                          print "you have killed your foe!"
+                      else:
+                          print "It has " + str(character.hitPoints) + " health left!"
                   else:
-                      print "It has " + str(character.hitPoints) + " health left!"
-          
-                  #return True
-
+                      print "You missed!"
+                      #return True
+                          
               else:
-                  print "You missed!"
-                  #return True
+                  print weapon.shortName + "is not a weapon! You'd be better off fighting with your bare hands!"
+                  return True
+
+
               
               #Foe fights back
               if character.hitPoints > 0:
@@ -132,15 +143,18 @@ class Character:
          if command <> '':
              if self.location.interpretCommand(self,command):
                 debug('Location command')
+                self.oldCommand = command #remember command
 
              elif self.inventory.interpretCommand(self,command):
                 debug('Inventory command')
+                self.oldCommand = command #remember command
 
              elif self.fightCharacter(command):
                 debug('Fight Character Command')
+                self.oldCommand = command #remember command
              else:
                 print 'huh?'
-         self.oldCommand = command
+         
 
 
     def doTurn(self):
