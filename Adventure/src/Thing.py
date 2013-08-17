@@ -60,6 +60,12 @@ class Treasure(Thing):
       self.hidden = True
       self.valueGold = valueGold
 
+class Armour(Thing):
+
+   def __init__(self, location, codes, shortName, longName, description,   hitPoints):
+
+      Thing.__init__(self,location, codes, shortName, longName, description)
+      self.hitPoints = hitPoints
 
 class Weapon(Thing):
 

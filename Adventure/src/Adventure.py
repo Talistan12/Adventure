@@ -1,7 +1,7 @@
 from Location import Location, Way
 from Inventory import Inventory
 from Character import Character
-from Thing import Thing, Treasure, Weapon, Food, Drink, Junk, Transport
+from Thing import Thing, Treasure, Weapon, Food, Drink, Junk, Transport, Armour
 from Util import userException, debug
 import random
 
@@ -54,6 +54,7 @@ Way(INHUT,ATTIC,['UP','U','MAGIC'],'Up','Up a ladder to the ceiling','You climb 
 Way(INHUT,HIDDENROOM,['XYZZY'],'Strange Mist','A Strange Mist is located here.','You enter the mist.')
 
 KNIFE = Weapon(INHUT,['KNIFE'],'a knife','A nasty sharp knife','It is a serrated knife.  Looks sharp.',['stab','slash'],2)
+CHAINMAIL = Armour(INHUT,['CHAIN','MAIL'],'chain mail','A Chain-Mail vest',' bit rusty, but should be useful',15)
 
 #HIDDENROOM
 Way(HIDDENROOM,INHUT,['XYZZY'],'Strange Mist','A Strange Mist is located here.','You enter the mist.')
@@ -92,8 +93,9 @@ Way(GRAVEYARD,VILLAGE,['PASSAGE','VILLAGE','DOWN','D','UNDERGROUND'],'Secret Pas
 Way(GRAVEYARD,CURSEDGLADE,['PATH','CURSEDGLADE'],'Disguised path','Through the cliff by a dark, thin, narrow path.',"A long walk later ...",'')
 
 ZOMBIE = Character(GRAVEYARD, 'ZOMBIE' ,'a zombie' ,'A rotting Zombie' ,'A rotting creature of the undead, who I believe used to be called "Bob"',random.randrange(4,13),60)
-BRAIN = Junk(ZOMBIE.inventory,'BRAIN','a brain','A bloody Brain.','Looks like it has just been removed.')
-CLUB = Weapon(ZOMBIE.inventory,'CLUB','a club','A Iron Club.',' it seems to have been made from pure steel and rivenwood.',['smash','hit','clobber'],5)
+BRAIN = Junk(ZOMBIE.inventory,['BRAIN'],'a brain','A bloody Brain.','Looks like it has just been removed.')
+CLUB = Weapon(ZOMBIE.inventory,['CLUB'],'a club','A Iron Club.',' it seems to have been made from pure steel and rivenwood.',['smash','hit','clobber'],5)
+LEATHERCHESTPLATE = Armour(ZOMBIE.inventory,['LEATHER','CHEST','PLATE'],'a chest plate','A Leather Chest Plate.',' it seems to have seem better days',15)
 
 #VILLAGE
 Way(VILLAGE,TAVERN,['IN','IN TAVERN'],'In Tavern','In to the Tavern.',"You enter the Tavern with it's hot, stuffy air.")

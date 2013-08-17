@@ -89,7 +89,7 @@ class Inventory:
 
       DroppedIt = False
       for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
-              if thingCode in (['ALL']+[thing.codes]):
+              if thingCode in (['ALL']+thing.codes):
                  print 'Dropped ' + thing.shortName + '!'
                  thing.moveThing(player.inventory, player.location)
                  DroppedIt = True
@@ -106,7 +106,7 @@ class Inventory:
 
    def lookThing(self, player, lookCommand):
       debug( 'Searching for thing.. ' + lookCommand)
-      if lookCommand.split()[0] == 'LOOK':
+      if lookCommand.split()[0] in ['LOOK','EXAMINE']:
          thingCode = lookCommand.split()[1]
       else:
          return False

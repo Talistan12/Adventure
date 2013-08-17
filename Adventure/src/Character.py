@@ -2,6 +2,7 @@ from Util import userException, debug
 from Inventory import Inventory
 import random
 from Thing import Weapon
+from Thing import Armour
 from Location import Location
 NOWHERE = Location('NOWHERE','You can not go here, but your hands can.')
 HANDS = Weapon(NOWHERE,'HANDS','your fists','A couple of calloused hands','Look out I am desperate now.',['punch','thump'],2)
@@ -88,14 +89,34 @@ class Character:
               if isinstance(weapon, Weapon):
                   print "You " + random.sample(weapon.actions,1)[0] + " " + character.shortName + " with " + weapon.shortName
                   if random.randint(1,2)==1:
-                      print "You got a direct hit!"
-                      character.hitPoints = character.hitPoints - (self.damagePoints + weapon.damagePoints)
-                      if character.hitPoints <= 0:
-                          character.inventory.quickDropAll(character)
-                          self.location.removeCharacter(character)
-                          print "you have killed your foe!"
-                      else:
-                          print "It has " + str(character.hitPoints) + " health left!"
+                      totalDamage = self.damagePoints + weapon.damagePoints
+                      #print "You got a direct hit!"
+                      #cycle thru each piece of armour the foe is wearing, until all the damage is absorbed or all armour exhausted
+                      for armour in character.inventory.things:
+                          if isinstance(armour, Armour) and totalDamage <> 0:
+                              #take damage from the armour 
+                              armour.hitPoints = armour.hitPoints - totalDamage
+                              if armour.hitPoints < 0:
+                                  #until run out of damage or armour.hitpoints
+                                  print armour.shortName + " worn by " + character.shortName + ' was destroyed! It is vulnerable!'
+                                  character.inventory.removeThing(armour)
+                                  totalDamage = -armour.hitPoints
+                              else:
+                                  print armour.shortName + " worn by " + character.shortName + ' has taken damage!'
+                                  totalDamage = 0            
+                      
+                      if totalDamage > 0:
+                          #when no more armour take damage off foe 
+                          character.hitPoints = character.hitPoints - totalDamage
+                          
+                          if character.hitPoints <= 0:
+                              character.inventory.quickDropAll(character)
+                              self.location.removeCharacter(character)
+                              print character.shortName + ' has been vanquished!'
+                              print "You have killed your foe!"
+                          else:
+                              print character.shortName + ' has been wounded!'
+                              print "It has " + str(character.hitPoints) + " health left!"
                   else:
                       print "You missed!"
                       #return True
@@ -103,20 +124,42 @@ class Character:
               else:
                   print weapon.shortName + "is not a weapon! You'd be better off fighting with your bare hands!"
                   return True
-
-
-              
+ 
               #Foe fights back
               if character.hitPoints > 0:
-                  print character.shortName + " takes a swing at you!" # + weapon.shortName
+                  print character.shortName + " comes at you!" 
                   if random.randint(1,2)==1:
-                      print "It hit you!!"
-                      self.hitPoints = self.hitPoints - character.damagePoints #+ weapon.damagePoints)
-                      if self.hitPoints <= 0:
-                          self.inventory.quickDropAll(self)
-                          print "YOU ............... ARE ............................... DEEEEEEEEAAAAAAAAD!"
-                      else:
-                          print "You have " + str(self.hitPoints) + " health left!"
+                      totalDamage = character.damagePoints
+                      for thing in character.inventory.things:
+                          if isinstance(thing, Weapon):
+                              weapon = thing
+                              totalDamage = character.damagePoints + weapon.damagePoints
+                              print character.shortName + " " + random.sample(weapon.actions,1)[0] + " you with " + weapon.shortName
+                              break
+           
+                      #cycle thru each piece of armour the foe is wearing, until all the damage is absorbed or all armour exhausted
+                      for armour in self.inventory.things:
+                          if isinstance(armour, Armour) and totalDamage <> 0:
+                              #take damage from the armour 
+                              armour.hitPoints = armour.hitPoints - totalDamage
+                              if armour.hitPoints < 0:
+                                  #until run out of damage or armour.hitpoints
+                                  print armour.shortName + " you were wearing was destroyed! You are vulnerable!"
+                                  self.inventory.removeThing(armour)
+                                  totalDamage = -armour.hitPoints
+                              else:
+                                  print armour.shortName + " you are wearing has taken damage!"
+                                  totalDamage = 0    
+  
+                      if totalDamage > 0:
+                          self.hitPoints = self.hitPoints - totalDamage
+                          if self.hitPoints <= 0:
+                              print "You were struck a mighty blow!"
+                              self.inventory.quickDropAll(self)
+                              print "YOU ............... ARE ............................... DEEEEEEEEAAAAAAAAD!"
+                          else:
+                              print "You've been wounded!"
+                              print "You have " + str(self.hitPoints) + " health left!"
                   else:
                       print "It missed!"
               return True

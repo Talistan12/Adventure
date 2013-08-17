@@ -208,7 +208,7 @@ class Location:
 
       GotIt = False
       for thing in reversed(self.things): #step backwards because removing items from the list changes the indexes.
-          if thingCode in (['ALL']+[thing.codes]):
+          if thingCode in (['ALL']+thing.codes):
                  print 'Got ' + thing.shortName + '!'
                  thing.moveThing(player.location, player.inventory)
                  GotIt = True
@@ -241,36 +241,7 @@ class Location:
          #So the lookThing routine will either find it or say its not here.
          #print "There is no " + characterCode.lower() + " here!"
          return False
-
-#   def fightCharacter(self, player, fightCommand):
-#      debug( 'Searching for character.. ' + fightCommand)
-#      if lookCommand.split()[0] == 'FIGHT':
-#         characterCode = lookCommand.split()[1]
-#      else:
-#         return False
-#
-#      try:
-#        character = self.findCharacter(characterCode)
-#        debug("Found character " + character.shortName)
-#        if lookCommand.split()[2] == 'WITH':
-#          weaponCode = lookCommand.split()[3]
-#          player.inventory
-#        else:
-#          print "With what?"
-#          return True
-#
-#
-#
-#
-#        print character.description
-#        return True
-#
-#      except userException,e:
-#         debug('Player is looking but if its a character its not here')
-#         print "There is no " + characterCode.lower + " here to fight."
-#         return True
-#
-
+ 
    def interpretCommand(self,player,command):
    # All commands related to a location, or stuff at locations (things, characters)
    # Return True if the command was understood in this context.
@@ -293,9 +264,6 @@ class Location:
       elif self.lookCharacter(command):
           debug('Look Character Command')
           return True
-#      elif self.fightCharacter(player,command):
-#          debug('Fight Character Command')
-#          return True
       else:
           return False
 
